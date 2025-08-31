@@ -1,0 +1,35 @@
+{
+  "name": "@yt-audio-summary/api-definition",
+  "version": "1.0.0",
+  "description": "Shared API definitions using tRPC and Hono for YouTube Audio Summary",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format .",
+    "format:fix": "biome format --write .",
+    "type-check": "tsc --noEmit",
+    "verify": "pnpm lint && pnpm type-check && pnpm build",
+    "test": "jest"
+  },
+  "keywords": ["trpc", "hono", "api", "types", "shared"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@trpc/server": "^11.0.0",
+    "hono": "^4.0.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "@biomejs/biome": "^1.8.0"
+  }
+}

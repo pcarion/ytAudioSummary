@@ -1,0 +1,35 @@
+{
+  "name": "@yt-audio-summary/web-extension",
+  "version": "1.0.0",
+  "description": "Web Extension using WXT for YouTube Audio Summary",
+  "type": "module",
+  "scripts": {
+    "build": "wxt build",
+    "dev": "wxt",
+    "zip": "wxt zip",
+    "clean": "rm -rf dist .output",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format .",
+    "format:fix": "biome format --write .",
+    "type-check": "tsc --noEmit",
+    "verify": "pnpm lint && pnpm type-check && pnpm build",
+    "test": "vitest"
+  },
+  "keywords": ["webextension", "wxt", "youtube", "audio", "trpc"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@yt-audio-summary/api-definition": "workspace:*",
+    "@trpc/client": "^11.0.0",
+    "@trpc/server": "^11.0.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "wxt": "^0.20.8",
+    "typescript": "^5.0.0",
+    "@types/chrome": "^0.0.254",
+    "@biomejs/biome": "^1.8.0",
+    "vitest": "^1.0.0"
+  }
+}

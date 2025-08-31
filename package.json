@@ -1,0 +1,25 @@
+{
+  "name": "ytAudioSummary",
+  "version": "1.0.0",
+  "description": "YouTube Audio Summary with Web Extension and Cloudflare Backend",
+  "private": true,
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
+    "format": "pnpm -r format",
+    "format:fix": "pnpm -r format:fix",
+    "clean": "pnpm -r clean",
+    "type-check": "pnpm -r type-check",
+    "verify": "pnpm lint && pnpm type-check && pnpm build"
+  },
+  "keywords": ["webextension", "cloudflare", "trpc", "hono", "youtube", "audio"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.0"
+  }
+}

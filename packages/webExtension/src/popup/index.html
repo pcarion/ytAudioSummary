@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Audio Summary</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header class="popup-header">
+      <h1>🎵 Audio Summary</h1>
+      <div class="status-container">
+        <div id="status-indicator" class="status-indicator disconnected" title="Status: disconnected"></div>
+        <span id="connection-status" class="connection-status">Status: disconnected</span>
+      </div>
+    </header>
+
+    <main class="popup-main">
+      <div class="control-section">
+        <button id="connect-btn" class="btn btn-primary">Connect</button>
+        <p class="help-text">Connect to backend API for audio processing</p>
+      </div>
+
+      <div class="control-section">
+        <button id="audio-capture-btn" class="btn btn-secondary" disabled>Start Capture</button>
+        <p class="help-text">Capture audio from YouTube video for summary generation</p>
+      </div>
+
+      <div class="info-section">
+        <h3>Current Video</h3>
+        <p id="video-info" class="video-info">No video detected</p>
+      </div>
+
+      <div class="results-section" id="results-section" style="display: none;">
+        <h3>Analysis Results</h3>
+        <div id="results-content"></div>
+      </div>
+    </main>
+
+    <footer class="popup-footer">
+      <p class="version">v1.0.0</p>
+    </footer>
+  </div>
+
+  <script type="module" src="./index.ts"></script>
+</body>
+</html>
