@@ -37,6 +37,9 @@ export default defineConfig({
   vite: () => ({
     build: {
       target: 'esnext'
+    },
+    css: {
+      postcss: './postcss.config.js'
     }
   })
 });
