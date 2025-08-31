@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button.jsx';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card.jsx';
 import { Badge } from '../../components/ui/badge.jsx';
 import { Wifi, WifiOff, Mic, Square, AlertCircle, CheckCircle } from 'lucide-react';
+
+declare const chrome: any;
 
 interface ConnectionStatus {
   connected: boolean;
@@ -156,10 +158,10 @@ function App() {
   };
 
   return (
-    <div className="w-80 min-h-96 bg-background">
+    <div className="h-full bg-background sidepanel">
       {/* Header */}
-      <div className="bg-gradient-to-br from-blue-600 to-purple-600 text-white p-5 text-center">
-        <h1 className="text-lg font-semibold mb-3">🎵 Audio Summary</h1>
+      <div className="bg-gradient-to-br from-blue-600 to-purple-600 text-white p-4 text-center">
+        <h1 className="text-lg font-semibold mb-2">🎵 Audio Summary</h1>
         <div className="flex items-center justify-center gap-2">
           {getStatusIcon()}
           <Badge variant={getStatusBadgeVariant()} className="text-xs">
@@ -169,7 +171,7 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <div className="p-5 space-y-6">
+      <div className="p-4 space-y-4 overflow-y-auto h-[calc(100vh-120px)]">
         {/* Connection Card */}
         <Card>
           <CardHeader className="pb-3">
@@ -256,7 +258,7 @@ function App() {
       </div>
 
       {/* Footer */}
-      <div className="p-4 bg-muted border-t border-border text-center">
+      <div className="p-3 bg-muted border-t border-border text-center">
         <p className="text-xs text-muted-foreground">v1.0.0</p>
       </div>
 

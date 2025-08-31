@@ -50,10 +50,20 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
   body {
-    @apply bg-background text-foreground;
+    background-color: white;
+    color: #111827;
+  }
+  
+  /* Sidepanel specific styles */
+  .sidepanel body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .sidepanel #root {
+    height: 100vh;
   }
 }
