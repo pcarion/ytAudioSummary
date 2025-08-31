@@ -15,14 +15,23 @@ export default defineConfig({
       'https://www.youtube.com/*',
       'https://*.cloudflare.com/*'
     ],
+    content_scripts: [
+      {
+        matches: ['https://www.youtube.com/*'],
+        js: ['entrypoints/contentScript.ts']
+      }
+    ],
+    background: {
+      service_worker: 'entrypoints/backgroundScript.ts'
+    },
     action: {
-      default_popup: 'src/popup/index.html',
+      default_popup: 'popup/index.html',
       default_title: 'YouTube Audio Summary'
     },
     icons: {
-      '16': 'src/assets/icon16.png',
-      '48': 'src/assets/icon48.png',
-      '128': 'src/assets/icon128.png'
+      '16': 'assets/icon16.png',
+      '48': 'assets/icon48.png',
+      '128': 'assets/icon128.png'
     }
   },
   vite: () => ({

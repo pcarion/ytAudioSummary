@@ -1,5 +1,4 @@
 // Background Service Worker
-import { defineBackground } from 'wxt';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 // import type { AppRouter } from '@yt-audio-summary/api-definition';
 
@@ -61,13 +60,12 @@ async function handleGetAnalysis(_videoId: string) {
 }
 
 // Handle tab updates to inject content script
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+// Note: Content script is now automatically injected via manifest
+// This listener is kept for potential future dynamic injection
+chrome.tabs.onUpdated.addListener((_tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url?.includes('youtube.com/watch')) {
-    chrome.scripting.executeScript({
-      target: { tabId },
-      files: ['src/content/index.ts']
-    }).catch(console.error);
+    console.log('YouTube tab updated:', tab.url);
   }
 });
 
-export default defineBackground();
+export default {};

@@ -1,5 +1,4 @@
 // Content Script for YouTube Pages
-
 // import type { AudioStreamData } from '@yt-audio-summary/api-definition';
 
 class YouTubeAudioHandler {
