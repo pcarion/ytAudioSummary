@@ -4,8 +4,6 @@
     "allowImportingTsExtensions": true,
     "jsx": "react-jsx"
   },
-  "include": [
-    "**/*"
-  ],
+  "include": ["**/*"],
   "exclude": [".output"]
 }
