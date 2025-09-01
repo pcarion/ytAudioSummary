@@ -79,6 +79,9 @@ importers:
       '@yt-audio-summary/api-definition':
         specifier: workspace:*
         version: link:../apiDefinition
+      '@yt-audio-summary/cf-backend':
+        specifier: workspace:*
+        version: link:../cfBackend
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1

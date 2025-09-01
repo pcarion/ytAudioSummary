@@ -1,5 +1,6 @@
 {
-  "name": "yt-audio-summary",
+  "name": "@yt-audio-summary/cf-backend",
+  "description": "YouTube Audio Summary Cloudflare Backend",
   "version": "0.0.0",
   "private": true,
   "scripts": {
