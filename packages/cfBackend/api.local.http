@@ -9,9 +9,9 @@
 ### The "0" key in the JSON contains the input parameters
 
 ### API Configuration
-@baseUrl = http://localhost:59941
+## @baseUrl = http://localhost:59941
 ### Alternative URLs:
-### @baseUrl = http://localhost:8787
+@baseUrl = https://yt-audio-summary.pcarion.workers.dev
 ### @baseUrl = https://your-production-domain.com
 ### @baseUrl = https://your-staging-domain.com
 
@@ -26,7 +26,6 @@ POST {{baseUrl}}/trpc/submitContent
 Content-Type: application/json
 
 {
-  "0": {
     "url": "https://youtube.com/watch?v=dQw4w9WgXcQ",
     "title": "Rick Astley - Never Gonna Give You Up",
     "domain": "youtube.com",
@@ -65,7 +64,6 @@ Content-Type: application/json
       "osName": "macOS",
       "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
     }
-  }
 }
 
 ###
@@ -75,7 +73,6 @@ POST {{baseUrl}}/trpc/submitContent
 Content-Type: application/json
 
 {
-  "0": {
     "url": "https://example.com/article",
     "title": "Example Article Title!",
     "domain": "example.com",
@@ -97,7 +94,7 @@ Content-Type: application/json
       "osName": "macOS",
       "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
     }
-  }
+
 }
 
 ###
@@ -107,9 +104,7 @@ POST {{baseUrl}}/trpc/approveSubmission
 Content-Type: application/json
 
 {
-    "0": {
-        "submissionId": "sub_1705312200000_abc123def456"
-    }
+	"submissionId": "sub_1705312200000_abc123def456"
 }
 
 ###
@@ -119,9 +114,7 @@ POST {{baseUrl}}/trpc/cancelSubmission
 Content-Type: application/json
 
 {
-    "0": {
-        "submissionId": "sub_1705312200000_abc123def456"
-    }
+	"submissionId": "sub_1705312200000_abc123def456"
 }
 
 ###
@@ -148,7 +141,6 @@ POST {{baseUrl}}/trpc/submitContent
 Content-Type: application/json
 
 {
-	"0": {
 		"url": "invalid-url",
 		"title": "Test with Invalid URL",
 		"domain": "invalid.com",
@@ -161,7 +153,6 @@ Content-Type: application/json
 			"osName": "macOS",
 			"userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 		}
-	}
 }
 
 ###
@@ -171,8 +162,6 @@ POST {{baseUrl}}/trpc/submitContent
 Content-Type: application/json
 
 {
-    "0": {
-        "url": "https://example.com",
-        "title": "Missing Fields Test"
-    }
+	"url": "https://example.com",
+	"title": "Missing Fields Test"
 }

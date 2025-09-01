@@ -32,6 +32,7 @@ interface ApiContextType {
 	getMe: () => Promise<Awaited<ReturnType<AppRouter["getMe"]>>>;
 	apiSettings: ApiSettings;
 	saveApiSettings: (apiSettings: ApiSettings) => Promise<void>;
+	isApiConfigured: boolean;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -115,6 +116,9 @@ export function ApiProvider({ children }: ApiProviderProps) {
 		return client.getMe.query();
 	};
 
+	const isApiConfigured =
+		apiSettings.apiUrl.trim() !== "" && apiSettings.apiToken.trim() !== "";
+
 	const value = {
 		submitContent,
 		approveSubmission,
@@ -122,6 +126,7 @@ export function ApiProvider({ children }: ApiProviderProps) {
 		getMe,
 		apiSettings,
 		saveApiSettings,
+		isApiConfigured,
 	};
 
 	return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
