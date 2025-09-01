@@ -3,6 +3,21 @@ import { Button } from '../../components/ui/button.jsx';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card.jsx';
 import { Badge } from '../../components/ui/badge.jsx';
 import { Wifi, WifiOff, Mic, Square, AlertCircle, CheckCircle } from 'lucide-react';
+import type { 
+  CheckConnectionRequest,
+  ConnectBackendRequest,
+  GetVideoInfoRequest,
+  StartAudioCaptureRequest,
+  StopAudioCaptureRequest,
+  VideoDetectedMessage,
+  ConnectionStatusMessage,
+  AnalysisCompleteMessage,
+  AnalysisErrorMessage,
+  CheckConnectionResponse,
+  ConnectBackendResponse,
+  GetVideoInfoResponse,
+  AudioCaptureResponse
+} from '../../lib/types/messages.js';
 
 declare const chrome: any;
 
@@ -49,7 +64,7 @@ function App() {
     checkCurrentVideo();
     
     // Listen for messages from background script
-    chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
+    chrome.runtime.onMessage.addListener((message: VideoDetectedMessage | ConnectionStatusMessage | AnalysisCompleteMessage | AnalysisErrorMessage, _sender: any, _sendResponse: any) => {
       if (message.type === 'connection_status') {
         setConnectionStatus(message.status);
       } else if (message.type === 'video_detected') {
@@ -67,7 +82,8 @@ function App() {
 
   const checkConnectionStatus = async () => {
     try {
-      const response = await chrome.runtime.sendMessage({ type: 'check_connection' });
+      const message: CheckConnectionRequest = { type: 'check_connection' };
+      const response = await chrome.runtime.sendMessage(message) as CheckConnectionResponse;
       if (response?.success) {
         setConnectionStatus({ connected: true, connecting: false, failed: false });
       }
@@ -78,7 +94,8 @@ function App() {
 
   const checkCurrentVideo = async () => {
     try {
-      const response = await chrome.runtime.sendMessage({ type: 'get_video_info' });
+      const message: GetVideoInfoRequest = { type: 'get_video_info' };
+      const response = await chrome.runtime.sendMessage(message) as GetVideoInfoResponse;
       if (response?.success && response.video) {
         setVideoInfo(response.video);
       }
@@ -91,7 +108,8 @@ function App() {
     setConnectionStatus({ connected: false, connecting: true, failed: false });
     
     try {
-      const response = await chrome.runtime.sendMessage({ type: 'connect_backend' });
+      const message: ConnectBackendRequest = { type: 'connect_backend' };
+      const response = await chrome.runtime.sendMessage(message) as ConnectBackendResponse;
       if (response?.success) {
         setConnectionStatus({ connected: true, connecting: false, failed: false });
         showNotification('success', 'Connected to backend!');
@@ -109,7 +127,8 @@ function App() {
     if (isCapturing) {
       // Stop capture
       try {
-        await chrome.runtime.sendMessage({ type: 'stop_audio_capture' });
+        const message: StopAudioCaptureRequest = { type: 'stop_audio_capture' };
+        await chrome.runtime.sendMessage(message) as AudioCaptureResponse;
         setIsCapturing(false);
         showNotification('success', 'Audio capture stopped');
       } catch (_error) {
@@ -118,7 +137,8 @@ function App() {
     } else {
       // Start capture
       try {
-        const response = await chrome.runtime.sendMessage({ type: 'start_audio_capture' });
+        const message: StartAudioCaptureRequest = { type: 'start_audio_capture' };
+        const response = await chrome.runtime.sendMessage(message) as AudioCaptureResponse;
         if (response?.success) {
           setIsCapturing(true);
           showNotification('success', 'Audio capture started');

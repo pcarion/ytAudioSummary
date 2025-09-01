@@ -1,3 +1,18 @@
+import type { 
+  ExtensionMessage, 
+  MessageResponse,
+  CheckConnectionRequest,
+  ConnectBackendRequest,
+  GetVideoInfoRequest,
+  StartAudioCaptureRequest,
+  StopAudioCaptureRequest,
+  VideoDetectedMessage,
+  CheckConnectionResponse,
+  ConnectBackendResponse,
+  GetVideoInfoResponse,
+  AudioCaptureResponse
+} from '../lib/types/messages.js';
+
 export default defineBackground(() => {
   console.log('YouTube Audio Summary Extension loaded!', { id: browser.runtime.id });
 
@@ -9,44 +24,58 @@ export default defineBackground(() => {
   });
 
   // Listen for messages from content scripts and sidepanel
-  browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  browser.runtime.onMessage.addListener((
+    message: ExtensionMessage, 
+    _sender, 
+    sendResponse: (response: MessageResponse<typeof message>) => void
+  ) => {
     console.log('Background received message:', message);
     
     switch (message.type) {
-      case 'check_connection':
+      case 'check_connection': {
         // Mock connection check
-        sendResponse({ success: true, connected: false });
+        const checkResponse: CheckConnectionResponse = { success: true, connected: false };
+        sendResponse(checkResponse);
         break;
+      }
         
-      case 'connect_backend':
+      case 'connect_backend': {
         // Mock backend connection
-        sendResponse({ success: true, connected: true });
+        const connectResponse: ConnectBackendResponse = { success: true, connected: true };
+        sendResponse(connectResponse);
         break;
+      }
         
-      case 'get_video_info':
+      case 'get_video_info': {
         // Mock video info
-        sendResponse({ 
+        const videoResponse: GetVideoInfoResponse = { 
           success: true, 
           video: {
             title: 'Sample YouTube Video',
             url: 'https://youtube.com/watch?v=sample',
             detected: true
           }
-        });
+        };
+        sendResponse(videoResponse);
         break;
+      }
         
-      case 'start_audio_capture':
+      case 'start_audio_capture': {
         // Mock audio capture start
-        sendResponse({ success: true });
+        const startResponse: AudioCaptureResponse = { success: true };
+        sendResponse(startResponse);
         break;
+      }
         
-      case 'stop_audio_capture':
+      case 'stop_audio_capture': {
         // Mock audio capture stop
-        sendResponse({ success: true });
+        const stopResponse: AudioCaptureResponse = { success: true };
+        sendResponse(stopResponse);
         break;
+      }
         
       default:
-        sendResponse({ success: false, error: 'Unknown message type' });
+        sendResponse({ success: false });
     }
     
     return true; // Keep the message channel open for async responses

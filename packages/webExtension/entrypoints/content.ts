@@ -1,3 +1,5 @@
+import type { VideoDetectedMessage } from '../lib/types/messages.js';
+
 export default defineContentScript({
   matches: ['*://*.youtube.com/*'],
   main() {
@@ -23,10 +25,11 @@ export default defineContentScript({
     // Send video info to background script
     const sendVideoInfo = () => {
       const videoInfo = detectVideoInfo();
-      browser.runtime.sendMessage({
+      const message: VideoDetectedMessage = {
         type: 'video_detected',
         video: videoInfo
-      });
+      };
+      browser.runtime.sendMessage(message);
     };
     
     // Initial detection
