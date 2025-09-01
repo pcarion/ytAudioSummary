@@ -25,12 +25,12 @@ export function Header({
         <img
           src={extensionLogo}
           className="h-12 p-0 transition-all hover:drop-shadow-[0_0_2em_#6366f1]"
-          alt="Snipwave logo"
+          alt="ytAudioSummary logo"
         />
       </Button>
       <div className="flex items-baseline justify-between w-full max-w-xs">
         <h1 className="text-xl font-bold text-black dark:text-white pl-2">
-          Snipwave
+          YouTube Audio Summary
         </h1>
         {userEmail && (
           <div className="text-sm text-gray-600 dark:text-gray-400">

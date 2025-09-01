@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -54,7 +52,7 @@
     background-color: white;
     color: #111827;
   }
-  
+
   /* Sidepanel specific styles */
   .sidepanel body {
     margin: 0;
@@ -62,7 +60,7 @@
     height: 100vh;
     overflow: hidden;
   }
-  
+
   .sidepanel #root {
     height: 100vh;
   }

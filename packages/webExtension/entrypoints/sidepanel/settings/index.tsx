@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Save, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useApi } from "@/lib/ApiContext";
 
 interface SettingsPageProps {
   onBack: () => void;
@@ -9,28 +10,23 @@ interface SettingsPageProps {
 export function SettingsPage({ onBack }: SettingsPageProps) {
   const [formData, setFormData] = useState({
     apiUrl: "",
-    accessToken: "",
+    apiToken: "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">(
     "idle"
   );
+  const { apiSettings, saveApiSettings } = useApi();
 
-  // useEffect(() => {
-  //   // Initialize form with current values
-  //   setFormData({
-  //     apiUrl: apiUrl || "",
-  //     accessToken: accessToken || "",
-  //   });
-  // }, [apiUrl, accessToken]);
+  useEffect(() => {
+    // Initialize form with current values
+    setFormData({
+      apiUrl: apiSettings.apiUrl || "",
+      apiToken: apiSettings.apiToken || "",
+    });
+  }, [apiSettings.apiUrl, apiSettings.apiToken]);
 
-  const apiUrl = "";
-  const accessToken = "";
-
-  const handleInputChange = (
-    field: "apiUrl" | "accessToken",
-    value: string
-  ) => {
+  const handleInputChange = (field: "apiUrl" | "apiToken", value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -42,7 +38,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
     setSaveStatus("idle");
 
     try {
-      // await saveDebugSettings(formData);
+      await saveApiSettings(formData);
       setSaveStatus("success");
 
       // Clear success message after 3 seconds
@@ -65,8 +61,8 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
   const handleCancel = () => {
     // Reset form to current values
     setFormData({
-      apiUrl: apiUrl || "",
-      accessToken: accessToken || "",
+      apiUrl: apiSettings.apiUrl || "",
+      apiToken: apiSettings.apiToken || "",
     });
     setSaveStatus("idle");
   };
@@ -80,7 +76,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
             variant="ghost"
             size="sm"
             onClick={onBack}
-            className="p-2 h-auto"
+            className="p-2 h-auto hover:bg-gray-100 dark:hover:bg-gray-700 dark:bg-gray-800 dark:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -120,14 +116,14 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
               htmlFor="access-token"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-              Access Token
+              API Token
             </label>
             <input
               id="access-token"
-              type="password"
-              placeholder="Enter your access token"
-              value={formData.accessToken}
-              onChange={(e) => handleInputChange("accessToken", e.target.value)}
+              type="text"
+              placeholder="Enter your API token"
+              value={formData.apiToken}
+              onChange={(e) => handleInputChange("apiToken", e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
             />
           </div>
@@ -154,12 +150,16 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
             <Button
               variant="outline"
               onClick={handleCancel}
-              className="flex-1"
+              className="flex-1 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
               disabled={isSaving}
             >
               Cancel
             </Button>
-            <Button onClick={handleSave} className="flex-1" disabled={isSaving}>
+            <Button
+              onClick={handleSave}
+              className="flex-1 dark:bg-blue-600 dark:hover:bg-blue-700"
+              disabled={isSaving}
+            >
               {isSaving ? (
                 <div className="flex items-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />

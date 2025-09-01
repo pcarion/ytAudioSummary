@@ -38,7 +38,7 @@ interface ApiContextType {
   ) => Promise<HttpApiCancelSubmissionResponse>;
   getMe: () => Promise<HttpApiGetMeResponse>;
   apiSettings: ApiSettings;
-  setApiSettings: (apiSettings: ApiSettings) => void;
+  saveApiSettings: (apiSettings: ApiSettings) => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -71,6 +71,14 @@ export function ApiProvider({ children }: ApiProviderProps) {
     };
     getApiSettings();
   }, []);
+
+  const saveApiSettings = async (apiSettings: ApiSettings) => {
+    await browser.storage.local.set({
+      apiUrl: apiSettings.apiUrl,
+      apiToken: apiSettings.apiToken,
+    });
+    setApiSettings(apiSettings);
+  };
 
   const makeApiRequest = async <T extends z.ZodType>(
     endpoint: string,
@@ -181,7 +189,7 @@ export function ApiProvider({ children }: ApiProviderProps) {
     cancelSubmission,
     getMe,
     apiSettings,
-    setApiSettings,
+    saveApiSettings,
   };
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;

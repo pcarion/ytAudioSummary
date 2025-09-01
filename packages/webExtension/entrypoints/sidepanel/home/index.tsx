@@ -253,11 +253,6 @@ export function Home({ onNavigateToFeed, onNavigateToSettings }: HomeProps) {
                   {isLoading ? "Processing..." : "Analyze Page"}
                 </Button>
               </div>
-              <div className="text-center">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  no credits required
-                </p>
-              </div>
             </div>
           </div>
         </div>
