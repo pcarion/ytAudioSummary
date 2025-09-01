@@ -8,7 +8,22 @@ import React, {
 	type ReactNode,
 } from "react";
 import { createApiClient, type ApiClient } from "../trpc/client";
-import type { AppRouter } from "@yt-audio-summary/api-definition";
+import type { AppRouter } from "@yt-audio-summary/cf-backend/src/router";
+
+// Export tRPC types for easier usage
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+
+export type RouterInputs = inferRouterInputs<AppRouter>;
+export type RouterOutputs = inferRouterOutputs<AppRouter>;
+
+// Use the proper tRPC input/output types
+export type SubmitContentInput = RouterInputs["submitContent"];
+export type SubmitContentOutput = RouterOutputs["submitContent"];
+export type ApproveSubmissionInput = RouterInputs["approveSubmission"];
+export type ApproveSubmissionOutput = RouterOutputs["approveSubmission"];
+export type CancelSubmissionInput = RouterInputs["cancelSubmission"];
+export type CancelSubmissionOutput = RouterOutputs["cancelSubmission"];
+export type GetMeOutput = RouterOutputs["getMe"];
 
 // keys to store the auth settings in the browser storage
 const STORAGE_API_TOKEN_KEY = "apiToken";
@@ -20,16 +35,14 @@ interface ApiSettings {
 }
 
 interface ApiContextType {
-	submitContent: (
-		input: Parameters<AppRouter["submitContent"]>[0]
-	) => Promise<Awaited<ReturnType<AppRouter["submitContent"]>>>;
+	submitContent: (input: SubmitContentInput) => Promise<SubmitContentOutput>;
 	approveSubmission: (
-		input: Parameters<AppRouter["approveSubmission"]>[0]
-	) => Promise<Awaited<ReturnType<AppRouter["approveSubmission"]>>>;
+		input: ApproveSubmissionInput
+	) => Promise<ApproveSubmissionOutput>;
 	cancelSubmission: (
-		input: Parameters<AppRouter["cancelSubmission"]>[0]
-	) => Promise<Awaited<ReturnType<AppRouter["cancelSubmission"]>>>;
-	getMe: () => Promise<Awaited<ReturnType<AppRouter["getMe"]>>>;
+		input: CancelSubmissionInput
+	) => Promise<CancelSubmissionOutput>;
+	getMe: () => Promise<GetMeOutput>;
 	apiSettings: ApiSettings;
 	saveApiSettings: (apiSettings: ApiSettings) => Promise<void>;
 	isApiConfigured: boolean;
@@ -82,8 +95,8 @@ export function ApiProvider({ children }: ApiProviderProps) {
 	};
 
 	const submitContent = async (
-		input: Parameters<AppRouter["submitContent"]>[0]
-	) => {
+		input: SubmitContentInput
+	): Promise<SubmitContentOutput> => {
 		console.log("Submitting content to:", apiSettings.apiUrl);
 		console.log("Submission body:", input);
 
@@ -92,8 +105,8 @@ export function ApiProvider({ children }: ApiProviderProps) {
 	};
 
 	const approveSubmission = async (
-		input: Parameters<AppRouter["approveSubmission"]>[0]
-	) => {
+		input: ApproveSubmissionInput
+	): Promise<ApproveSubmissionOutput> => {
 		console.log("Approving submission to:", apiSettings.apiUrl);
 		console.log("Submission body:", input);
 
@@ -102,8 +115,8 @@ export function ApiProvider({ children }: ApiProviderProps) {
 	};
 
 	const cancelSubmission = async (
-		input: Parameters<AppRouter["cancelSubmission"]>[0]
-	) => {
+		input: CancelSubmissionInput
+	): Promise<CancelSubmissionOutput> => {
 		console.log("Canceling submission to:", apiSettings.apiUrl);
 		console.log("Submission body:", input);
 
@@ -111,7 +124,7 @@ export function ApiProvider({ children }: ApiProviderProps) {
 		return client.cancelSubmission.mutate(input);
 	};
 
-	const getMe = async () => {
+	const getMe = async (): Promise<GetMeOutput> => {
 		const client = getClient();
 		return client.getMe.query();
 	};

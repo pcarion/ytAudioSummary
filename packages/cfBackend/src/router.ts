@@ -94,27 +94,14 @@ export const appRouter = router({
 		console.log("getMe called");
 
 		// Mock user data
-		// In a real implementation, this would:
-		// 1. Validate authentication token
-		// 2. Fetch user data from database
-		// 3. Get user's submissions and feed
-		// 4. Calculate current credits
 
 		return {
-			isAuthenticated: true,
-			user: {
-				userId: "user_123",
-				email: "user@example.com",
-				name: "Test User",
+			information: {
 				rssUrlPath: "/rss/user_123",
-				isAdmin: false,
-				isPaused: false,
-				isDisabled: false,
 			},
 			lastSubmissions: [
 				{
 					submissionId: "sub_123",
-					submissionType: "youtube_video",
 					date: new Date().toISOString(),
 					approvalStatus: "notConfirmed" as const,
 					submissionStatus: "pending" as const,
@@ -133,10 +120,6 @@ export const appRouter = router({
 					originalContentUrl: "https://youtube.com/watch?v=example",
 				},
 			],
-			credits: {
-				availableCredits: 95,
-				lastUpdate: new Date().toISOString(),
-			},
 			messages: [
 				{
 					message: "Welcome to YouTube Audio Summary!",
@@ -147,3 +130,6 @@ export const appRouter = router({
 		};
 	}),
 });
+
+// Export the router type for client usage
+export type AppRouter = typeof appRouter;

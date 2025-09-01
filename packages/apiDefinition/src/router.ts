@@ -75,20 +75,12 @@ export const cancelSubmissionResponse = z.object({
 });
 
 export const getMeResponse = z.object({
-	isAuthenticated: z.boolean(),
-	user: z.object({
-		userId: z.string(),
-		email: z.string(),
-		name: z.string(),
+	information: z.object({
 		rssUrlPath: z.string(),
-		isAdmin: z.boolean(),
-		isPaused: z.boolean(),
-		isDisabled: z.boolean(),
 	}),
 	lastSubmissions: z.array(
 		z.object({
 			submissionId: z.string(),
-			submissionType: z.string(),
 			date: z.string(),
 			approvalStatus: z.enum(["notConfirmed", "confirmed", "rejected"]),
 			submissionStatus: z.enum([
@@ -99,7 +91,6 @@ export const getMeResponse = z.object({
 			]),
 			url: z.string(),
 			title: z.string(),
-			creditsCost: z.number(),
 		})
 	),
 	feedContents: z.array(
@@ -112,10 +103,6 @@ export const getMeResponse = z.object({
 			originalContentUrl: z.string(),
 		})
 	),
-	credits: z.object({
-		availableCredits: z.number(),
-		lastUpdate: z.string(),
-	}),
 	messages: z.array(
 		z.object({
 			message: z.string(),
