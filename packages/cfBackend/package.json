@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "build": "wrangler deploy --dry-run",
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
     "start": "wrangler dev",
@@ -16,6 +17,7 @@
     "verify": "pnpm lint && pnpm type-check && pnpm build"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.8.0",
     "@cloudflare/vitest-pool-workers": "^0.8.19",
     "typescript": "^5.5.2",
     "vitest": "~3.2.0",
