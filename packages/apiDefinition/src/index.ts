@@ -13,14 +13,6 @@ export {
 	getMeResponse,
 } from "./router";
 
-// Export response types
-export type {
-	GetMeResponse,
-	SubmitContentResponse,
-	ExecSubmissionResponse,
-	CancelSubmissionResponse,
-} from "./types";
-
 // Export client types (type-only, no runtime code)
 export type {
 	AppRouter,
@@ -31,4 +23,4 @@ export type {
 	CancelSubmissionInput,
 	CancelSubmissionOutput,
 	GetMeOutput,
-} from "./client-types";
+} from "./types";
