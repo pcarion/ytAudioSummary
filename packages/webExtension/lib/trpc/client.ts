@@ -18,3 +18,5 @@ export function createApiClient(apiUrl: string, apiToken?: string) {
     ],
   });
 }
+
+export type ApiClient = ReturnType<typeof createApiClient>;

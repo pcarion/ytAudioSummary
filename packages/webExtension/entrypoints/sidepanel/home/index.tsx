@@ -1,18 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
-import { CreditCard, Clock, Loader2, Rss, RefreshCw } from "lucide-react";
-import { format } from "timeago.js";
+import { Clock, RefreshCw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Header } from "./header";
 import { Loading } from "@/components/loading";
 import { CreditsPanel } from "./creditsPanel";
 import { FeedPanel } from "./feedPanel";
-import { onMessage, messaging } from "@/lib/messaging";
+import { messaging } from "@/lib/messaging";
 import type { GetPageContent } from "@/lib/types/messages";
 import { getBrowserInfo } from "@/lib/browserInfo";
 import { pageContentToApiSubmission } from "@/lib/youtube/pageContentToApiSubmission";
 import { useApi } from "@/lib/ApiContext";
-import type { HttpApiGetMeResponse } from "@/lib/ApiContext/types/httpUserApi/HttpApiGetMeResponse";
 import { PendingSubmission } from "./pending";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { extractDomainFromUrl } from "./utils";

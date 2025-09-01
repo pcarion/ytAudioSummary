@@ -4,8 +4,8 @@ import { ArrowLeft, Rss } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/loading";
 import { useApi } from "@/lib/ApiContext";
-import type { HttpApiGetMeResponse } from "@/lib/ApiContext/types/httpUserApi/HttpApiGetMeResponse";
 import { FeedElement } from "./feedElement";
+import type { GetMeResponse } from "@yt-audio-summary/api-definition";
 
 interface FeedPageProps {
   onBack: () => void;
@@ -14,7 +14,7 @@ interface FeedPageProps {
 export function FeedPage({ onBack }: FeedPageProps) {
   const { getMe } = useApi();
 
-  const [userData, setUserData] = useState<HttpApiGetMeResponse | null>(null);
+  const [userData, setUserData] = useState<GetMeResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

@@ -1,50 +1,82 @@
-// Shared API Types
+import { z } from "zod";
 
-export interface AudioStreamData {
-  audioChunk: ArrayBuffer;
-  sampleRate: number;
-  channels: number;
-  timestamp: number;
-  videoId?: string;
-}
+// Response schemas
+export const submitContentResponse = z.object({
+  success: z.boolean(),
+  submissionId: z.string(),
+  submissionType: z.string(),
+  submissionUrl: z.string(),
+  submissionTitle: z.string(),
+  message: z.string(),
+  credits: z.object({
+    current: z.number(),
+    creditsCost: z.number(),
+  }),
+});
 
-export interface AudioAnalysisResult {
-  id: string;
-  videoId: string;
-  summary: string;
-  transcript: string;
-  duration: number;
-  processedAt: Date;
-  confidence: number;
-}
+export const execSubmissionResponse = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
 
-export interface ConnectionState {
-  status: 'connecting' | 'connected' | 'disconnected' | 'failed';
-  error?: string;
-  connectionId?: string;
-  lastActivity: Date;
-}
+export const cancelSubmissionResponse = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
 
-export interface APIResponse<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  timestamp: Date;
-}
+export const getMeResponse = z.object({
+  isAuthenticated: z.boolean(),
+  user: z.object({
+    userId: z.string(),
+    email: z.string(),
+    name: z.string(),
+    rssUrlPath: z.string(),
+    isAdmin: z.boolean(),
+    isPaused: z.boolean(),
+    isDisabled: z.boolean(),
+  }),
+  lastSubmissions: z.array(
+    z.object({
+      submissionId: z.string(),
+      submissionType: z.string(),
+      date: z.string(),
+      approvalStatus: z.enum(["notConfirmed", "confirmed", "rejected"]),
+      submissionStatus: z.enum([
+        "pending",
+        "processing",
+        "completed",
+        "failed",
+      ]),
+      url: z.string(),
+      title: z.string(),
+      creditsCost: z.number(),
+    })
+  ),
+  feedContents: z.array(
+    z.object({
+      contentId: z.string(),
+      title: z.string(),
+      author: z.string(),
+      pathToAudio: z.string(),
+      pathToImage: z.string(),
+      originalContentUrl: z.string(),
+    })
+  ),
+  credits: z.object({
+    availableCredits: z.number(),
+    lastUpdate: z.string(),
+  }),
+  messages: z.array(
+    z.object({
+      message: z.string(),
+      type: z.string(),
+      createdAt: z.string(),
+    })
+  ),
+});
 
-export interface PaginationParams {
-  page: number;
-  limit: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
+// Export types
+export type SubmitContentResponse = z.infer<typeof submitContentResponse>;
+export type ExecSubmissionResponse = z.infer<typeof execSubmissionResponse>;
+export type CancelSubmissionResponse = z.infer<typeof cancelSubmissionResponse>;
+export type GetMeResponse = z.infer<typeof getMeResponse>;
