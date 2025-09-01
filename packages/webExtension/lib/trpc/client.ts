@@ -1,0 +1,20 @@
+import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import type { AppRouter } from "@yt-audio-summary/api-definition";
+
+// Create tRPC client
+export function createApiClient(apiUrl: string, apiToken?: string) {
+  return createTRPCClient<AppRouter>({
+    links: [
+      httpBatchLink({
+        url: `${apiUrl}/trpc`,
+        headers: () => {
+          const headers: Record<string, string> = {};
+          if (apiToken) {
+            headers.Authorization = `Bearer ${apiToken}`;
+          }
+          return headers;
+        },
+      }),
+    ],
+  });
+}

@@ -1,21 +1,13 @@
-import React, { createContext, useContext, type ReactNode } from "react";
-import { z } from "zod";
-import type { HttpApiSubmitContentBody } from "./types/httpContentSubmission/HttpApiSubmitContentBody";
-import type { HttpApiSubmitContentResponse } from "./types/httpContentSubmission/HttpApiSubmitContentResponse";
-import type { HttpApiExecSubmissionBody } from "./types/httpContentSubmission/HttpApiExecSubmissionBody";
-import type { HttpApiExecSubmissionResponse } from "./types/httpContentSubmission/HttpApiExecSubmissionResponse";
-import type { HttpApiCancelSubmissionBody } from "./types/httpContentSubmission/HttpApiCancelSubmissionBody";
-import type { HttpApiCancelSubmissionResponse } from "./types/httpContentSubmission/HttpApiCancelSubmissionResponse";
-import { HttpApiSubmitContentResponseSchema } from "./types/httpContentSubmission/HttpApiSubmitContentResponseSchema";
-import { HttpApiExecSubmissionResponseSchema } from "./types/httpContentSubmission/HttpApiExecSubmissionResponseSchema";
-import { HttpApiCancelSubmissionResponseSchema } from "./types/httpContentSubmission/HttpApiCancelSubmissionResponseSchema";
-import type { HttpApiGetMeResponse } from "./types/httpUserApi/HttpApiGetMeResponse";
-import { HttpApiGetMeResponseSchema } from "./types/httpUserApi/HttpApiGetMeResponseSchema";
-
-const apiCallEnvelopeSchema = z.object({
-  now: z.string(),
-  payload: z.any(),
-});
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  type ReactNode,
+} from "react";
+import { createApiClient } from "../trpc/client";
+import type { AppRouter } from "@yt-audio-summary/api-definition";
 
 // keys to store the auth settings in the browser storage
 const STORAGE_API_TOKEN_KEY = "apiToken";
@@ -27,16 +19,10 @@ interface ApiSettings {
 }
 
 interface ApiContextType {
-  submitContent: (
-    submissionBody: HttpApiSubmitContentBody
-  ) => Promise<HttpApiSubmitContentResponse>;
-  approveSubmission: (
-    submissionBody: HttpApiExecSubmissionBody
-  ) => Promise<HttpApiExecSubmissionResponse>;
-  cancelSubmission: (
-    submissionBody: HttpApiCancelSubmissionBody
-  ) => Promise<HttpApiCancelSubmissionResponse>;
-  getMe: () => Promise<HttpApiGetMeResponse>;
+  submitContent: AppRouter["submitContent"];
+  approveSubmission: AppRouter["approveSubmission"];
+  cancelSubmission: AppRouter["cancelSubmission"];
+  getMe: AppRouter["getMe"];
   apiSettings: ApiSettings;
   saveApiSettings: (apiSettings: ApiSettings) => Promise<void>;
 }
@@ -49,7 +35,6 @@ interface ApiProviderProps {
 
 export function ApiProvider({ children }: ApiProviderProps) {
   const effectRan = useRef(false);
-
   const [apiSettings, setApiSettings] = useState<ApiSettings>({
     apiUrl: "",
     apiToken: "",
@@ -80,107 +65,47 @@ export function ApiProvider({ children }: ApiProviderProps) {
     setApiSettings(apiSettings);
   };
 
-  const makeApiRequest = async <T extends z.ZodType>(
-    endpoint: string,
-    body: unknown,
-    responseSchema: T
-  ): Promise<z.infer<T>> => {
-    const method = body === null ? "GET" : "POST";
+  // Create tRPC client with current settings
+  const getClient = () => {
     if (!apiSettings.apiUrl) {
       throw new Error("API URL not found");
     }
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-
-    if (apiSettings.apiToken) {
-      headers.Authorization = `Bearer ${apiSettings.apiToken}`;
-    }
-
-    console.log(">http>apiUrl", apiSettings.apiUrl);
-    console.log(">http>endpoint", endpoint);
-    console.log(
-      ">http>headers>accessToken",
-      headers,
-      (apiSettings.apiToken || "").substring(0, 10),
-      "..."
-    );
-    console.log(">http>method", method);
-    console.log(">http>body", body);
-
-    const response = await fetch(`${apiSettings.apiUrl}${endpoint}`, {
-      method,
-      body: method === "POST" ? JSON.stringify(body) : null,
-      headers,
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `API request failed: ${response.status} ${response.statusText}`
-      );
-    }
-
-    // check if the response is a valid apiCallEnvelope
-    const responseEnvelope = await response.json();
-    const parsedEnvelope = apiCallEnvelopeSchema.safeParse(responseEnvelope);
-    if (!parsedEnvelope.success) {
-      throw new Error("Invalid API response envelope");
-    }
-
-    const payload = parsedEnvelope.data.payload;
-
-    // Validate the payload against the provided schema
-    const parsedPayload = responseSchema.safeParse(payload);
-    if (!parsedPayload.success) {
-      throw new Error("Invalid API response payload");
-    }
-
-    console.log(">http>response>payload", parsedPayload.data);
-
-    return parsedPayload.data;
+    return createApiClient(apiSettings.apiUrl, apiSettings.apiToken);
   };
 
-  const submitContent = async (
-    submissionBody: HttpApiSubmitContentBody
-  ): Promise<HttpApiSubmitContentResponse> => {
+  const submitContent: AppRouter["submitContent"] = async (
+    input: Parameters<AppRouter["submitContent"]>[0]
+  ) => {
     console.log("Submitting content to:", apiSettings.apiUrl);
-    console.log("Submission body:", submissionBody);
+    console.log("Submission body:", input);
 
-    return makeApiRequest(
-      "/api/content/submit",
-      submissionBody,
-      HttpApiSubmitContentResponseSchema
-    );
+    const client = getClient();
+    return client.submitContent.mutate(input);
   };
 
-  const approveSubmission = async (
-    submissionBody: HttpApiExecSubmissionBody
-  ): Promise<HttpApiExecSubmissionResponse> => {
+  const approveSubmission: AppRouter["approveSubmission"] = async (
+    input: Parameters<AppRouter["approveSubmission"]>[0]
+  ) => {
     console.log("Approving submission to:", apiSettings.apiUrl);
-    console.log("Submission body:", submissionBody);
+    console.log("Submission body:", input);
 
-    return makeApiRequest(
-      "/api/content/exec",
-      submissionBody,
-      HttpApiExecSubmissionResponseSchema
-    );
+    const client = getClient();
+    return client.approveSubmission.mutate(input);
   };
 
-  const cancelSubmission = async (
-    submissionBody: HttpApiCancelSubmissionBody
-  ): Promise<HttpApiCancelSubmissionResponse> => {
+  const cancelSubmission: AppRouter["cancelSubmission"] = async (
+    input: Parameters<AppRouter["cancelSubmission"]>[0]
+  ) => {
     console.log("Canceling submission to:", apiSettings.apiUrl);
-    console.log("Submission body:", submissionBody);
+    console.log("Submission body:", input);
 
-    return makeApiRequest(
-      "/api/content/cancel",
-      submissionBody,
-      HttpApiCancelSubmissionResponseSchema
-    );
+    const client = getClient();
+    return client.cancelSubmission.mutate(input);
   };
 
-  const getMe = async (): Promise<HttpApiGetMeResponse> => {
-    return makeApiRequest("/api/user/me", null, HttpApiGetMeResponseSchema);
+  const getMe: AppRouter["getMe"] = async () => {
+    const client = getClient();
+    return client.getMe.query();
   };
 
   const value = {

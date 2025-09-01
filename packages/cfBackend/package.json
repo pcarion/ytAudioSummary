@@ -23,6 +23,7 @@
   "dependencies": {
     "@yt-audio-summary/api-definition": "workspace:*",
     "@trpc/server": "^11.0.0",
+    "@hono/node-server": "^1.8.0",
     "hono": "^4.0.0",
     "zod": "^3.22.0"
   },

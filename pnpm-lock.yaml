@@ -36,6 +36,9 @@ importers:
 
   packages/cfBackend:
     dependencies:
+      '@hono/node-server':
+        specifier: ^1.8.0
+        version: 1.19.1(hono@4.9.5)
       '@trpc/server':
         specifier: ^11.0.0
         version: 11.5.0(typescript@5.9.2)
@@ -70,6 +73,12 @@ importers:
       '@radix-ui/react-tabs':
         specifier: ^1.1.13
         version: 1.1.13(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@trpc/client':
+        specifier: ^11.0.0
+        version: 11.5.0(@trpc/server@11.5.0(typescript@5.9.2))(typescript@5.9.2)
+      '@yt-audio-summary/api-definition':
+        specifier: workspace:*
+        version: link:../apiDefinition
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -654,6 +663,12 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
+  '@hono/node-server@1.19.1':
+    resolution: {integrity: sha512-h44e5s+ByUriaRIbeS/C74O8v90m0A95luyYQGMF7KEn96KkYMXO7bZAwombzTpjQTU4e0TkU8U1WBIXlwuwtA==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      hono: ^4
+
   '@img/sharp-darwin-arm64@0.33.5':
     resolution: {integrity: sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ==}
     engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
@@ -1158,6 +1173,12 @@ packages:
 
   '@tailwindcss/postcss@4.1.12':
     resolution: {integrity: sha512-5PpLYhCAwf9SJEeIsSmCDLgyVfdBhdBpzX1OJ87anT9IVR0Z9pjM0FNixCAUAHGnMBGB8K99SwAheXrT0Kh6QQ==}
+
+  '@trpc/client@11.5.0':
+    resolution: {integrity: sha512-32oH+KOAdo73jJKjU9tyG+vCjID6A28NgXwUNr691O5HjpF5yyTX51Zzyee8YtGzU89Nw/drCHdfA4gD7BN2eg==}
+    peerDependencies:
+      '@trpc/server': 11.5.0
+      typescript: '>=5.7.2'
 
   '@trpc/server@11.5.0':
     resolution: {integrity: sha512-0IBtkmUCeO2ycn4K45/cqsujnlCQrSvkCo7lFDpg3kGMIPiLyLRciID5IiS7prEjRjeITa+od2aaHTIwONApVw==}
@@ -3439,6 +3460,10 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
+  '@hono/node-server@1.19.1(hono@4.9.5)':
+    dependencies:
+      hono: 4.9.5
+
   '@img/sharp-darwin-arm64@0.33.5':
     optionalDependencies:
       '@img/sharp-libvips-darwin-arm64': 1.0.4
@@ -3833,6 +3858,11 @@ snapshots:
       '@tailwindcss/oxide': 4.1.12
       postcss: 8.5.6
       tailwindcss: 4.1.12
+
+  '@trpc/client@11.5.0(@trpc/server@11.5.0(typescript@5.9.2))(typescript@5.9.2)':
+    dependencies:
+      '@trpc/server': 11.5.0(typescript@5.9.2)
+      typescript: 5.9.2
 
   '@trpc/server@11.5.0(typescript@5.9.2)':
     dependencies:
