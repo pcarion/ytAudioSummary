@@ -1,18 +1,23 @@
 /**
- * Welcome to Cloudflare Workers! This is your first worker.
+ * YouTube Audio Summary API - Cloudflare Workers Backend
  *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run `npm run deploy` to publish your worker
+ * This worker serves the tRPC API for the YouTube Audio Summary application.
+ * It provides endpoints for content submission, user management, and feed operations.
  *
- * Bind resources to your worker in `wrangler.jsonc`. After adding bindings, a type definition for the
- * `Env` object can be regenerated with `npm run cf-typegen`.
- *
- * Learn more at https://developers.cloudflare.com/workers/
+ * - Run `npm run dev` to start a development server
+ * - Run `npm run deploy` to publish to Cloudflare Workers
+ * - API endpoints are available at /trpc/*
+ * - Health check available at /health
  */
 
+import app from "./trpc";
+
 export default {
-	async fetch(_request, _env, _ctx): Promise<Response> {
-		return new Response('Hello World!');
+	async fetch(
+		request: Request,
+		env: Env,
+		ctx: ExecutionContext
+	): Promise<Response> {
+		return app.fetch(request, env, ctx);
 	},
 } satisfies ExportedHandler<Env>;
