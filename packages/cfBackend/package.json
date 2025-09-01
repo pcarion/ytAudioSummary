@@ -1,36 +1,24 @@
 {
-  "name": "@yt-audio-summary/cf-backend",
-  "version": "1.0.0",
-  "description": "Cloudflare Workers backend using Hono and tRPC for YouTube Audio Summary",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "name": "yt-audio-summary",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "build": "tsc",
-    "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "clean": "rm -rf dist",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "test": "vitest",
+    "cf-typegen": "wrangler types",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "format": "biome format .",
     "format:fix": "biome format --write .",
     "type-check": "tsc --noEmit",
-    "verify": "pnpm lint && pnpm type-check && pnpm build",
-    "test": "jest"
-  },
-  "keywords": ["cloudflare", "workers", "hono", "trpc", "backend"],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@yt-audio-summary/api-definition": "workspace:*",
-    "@trpc/server": "^11.0.0",
-    "@hono/node-server": "^1.8.0",
-    "hono": "^4.0.0",
-    "zod": "^3.22.0"
+    "verify": "pnpm lint && pnpm type-check && pnpm build"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "@types/node": "^20.0.0",
-    "wrangler": "^3.0.0",
-    "@biomejs/biome": "^1.8.0"
+    "@cloudflare/vitest-pool-workers": "^0.8.19",
+    "typescript": "^5.5.2",
+    "vitest": "~3.2.0",
+    "wrangler": "^4.33.1"
   }
 }
