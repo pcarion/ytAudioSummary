@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { appRouter } from "@yt-audio-summary/api-definition";
+import { appRouter } from "./router";
 
 // Create Hono app
 const app = new Hono();
