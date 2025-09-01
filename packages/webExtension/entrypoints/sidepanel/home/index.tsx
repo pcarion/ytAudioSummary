@@ -3,22 +3,16 @@ import { CreditCard, Clock, Loader2, Rss, RefreshCw } from "lucide-react";
 import { format } from "timeago.js";
 
 import { Button } from "@/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../../components/ui/tabs";
 import { Header } from "./header";
-import { Loading } from "../../../components/loading";
+import { Loading } from "@/components/loading";
 import { CreditsPanel } from "./creditsPanel";
 import { FeedPanel } from "./feedPanel";
 import { onMessage, messaging } from "@/lib/messaging";
 import type { GetPageContent } from "@/lib/types/messages";
 import { getBrowserInfo } from "@/lib/browserInfo";
 import { pageContentToApiSubmission } from "@/lib/youtube/pageContentToApiSubmission";
-import { useApi } from "../../../lib/ApiContext";
-import type { HttpApiGetMeResponse } from "../../../lib/ApiContext/types/httpUserApi/HttpApiGetMeResponse";
+import { useApi } from "@/lib/ApiContext";
+import type { HttpApiGetMeResponse } from "@/lib/ApiContext/types/httpUserApi/HttpApiGetMeResponse";
 import { PendingSubmission } from "./pending";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { extractDomainFromUrl } from "./utils";
@@ -35,7 +29,6 @@ export function Home({ onNavigateToFeed, onNavigateToSettings }: HomeProps) {
     PendingSubmission[]
   >([]);
 
-  const [currentUrl, setCurrentUrl] = useState("");
   const [pageContent, setPageContent] = useState<GetPageContent | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [userData, setUserData] = useState<HttpApiGetMeResponse | null>(null);
@@ -63,21 +56,6 @@ export function Home({ onNavigateToFeed, onNavigateToSettings }: HomeProps) {
     } finally {
       setIsLoadingUserData(false);
       setIsApiLoading(false);
-    }
-  };
-
-  const getPageUrl = async () => {
-    try {
-      const tabs = await browser.tabs.query({
-        active: true,
-        currentWindow: true,
-      });
-      if (tabs[0]?.url) {
-        setCurrentUrl(tabs[0].url);
-        console.log("Current page URL:", tabs[0].url);
-      }
-    } catch (error) {
-      console.error("Error getting page URL:", error);
     }
   };
 
@@ -224,7 +202,7 @@ export function Home({ onNavigateToFeed, onNavigateToSettings }: HomeProps) {
 
         <Header
           onSettingsClick={onNavigateToSettings}
-          isApiLoading={isApiLoading}
+          isApiLoading={isApiLoading || isLoadingUserData}
         />
 
         {/* Credits and Feed Panels */}

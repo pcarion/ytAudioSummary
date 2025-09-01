@@ -17,8 +17,14 @@ const apiCallEnvelopeSchema = z.object({
   payload: z.any(),
 });
 
-const apiUrl = "";
-const apiAccessToken = "";
+// keys to store the auth settings in the browser storage
+const STORAGE_API_TOKEN_KEY = "apiToken";
+const STORAGE_API_URL_KEY = "apiUrl";
+
+interface ApiSettings {
+  apiUrl: string;
+  apiToken: string;
+}
 
 interface ApiContextType {
   submitContent: (
@@ -31,6 +37,8 @@ interface ApiContextType {
     submissionBody: HttpApiCancelSubmissionBody
   ) => Promise<HttpApiCancelSubmissionResponse>;
   getMe: () => Promise<HttpApiGetMeResponse>;
+  apiSettings: ApiSettings;
+  setApiSettings: (apiSettings: ApiSettings) => void;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -40,35 +48,59 @@ interface ApiProviderProps {
 }
 
 export function ApiProvider({ children }: ApiProviderProps) {
+  const effectRan = useRef(false);
+
+  const [apiSettings, setApiSettings] = useState<ApiSettings>({
+    apiUrl: "",
+    apiToken: "",
+  });
+
+  useEffect(() => {
+    if (effectRan.current) return;
+    effectRan.current = true;
+
+    const getApiSettings = async () => {
+      const result = await browser.storage.local.get([
+        STORAGE_API_URL_KEY,
+        STORAGE_API_TOKEN_KEY,
+      ]);
+      console.log("## result from storage", result);
+      // we update the settings
+      const { apiUrl, apiToken } = result;
+      setApiSettings({ apiUrl: apiUrl || "", apiToken: apiToken || "" });
+    };
+    getApiSettings();
+  }, []);
+
   const makeApiRequest = async <T extends z.ZodType>(
     endpoint: string,
     body: unknown,
     responseSchema: T
   ): Promise<z.infer<T>> => {
     const method = body === null ? "GET" : "POST";
-    if (!apiUrl) {
+    if (!apiSettings.apiUrl) {
       throw new Error("API URL not found");
     }
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
 
-    if (apiAccessToken) {
-      headers.Authorization = `Bearer ${apiAccessToken}`;
+    if (apiSettings.apiToken) {
+      headers.Authorization = `Bearer ${apiSettings.apiToken}`;
     }
 
-    console.log(">http>apiUrl", apiUrl);
+    console.log(">http>apiUrl", apiSettings.apiUrl);
     console.log(">http>endpoint", endpoint);
     console.log(
       ">http>headers>accessToken",
       headers,
-      (apiAccessToken || "").substring(0, 10),
+      (apiSettings.apiToken || "").substring(0, 10),
       "..."
     );
     console.log(">http>method", method);
     console.log(">http>body", body);
 
-    const response = await fetch(`${apiUrl}${endpoint}`, {
+    const response = await fetch(`${apiSettings.apiUrl}${endpoint}`, {
       method,
       body: method === "POST" ? JSON.stringify(body) : null,
       headers,
@@ -103,7 +135,7 @@ export function ApiProvider({ children }: ApiProviderProps) {
   const submitContent = async (
     submissionBody: HttpApiSubmitContentBody
   ): Promise<HttpApiSubmitContentResponse> => {
-    console.log("Submitting content to:", apiUrl);
+    console.log("Submitting content to:", apiSettings.apiUrl);
     console.log("Submission body:", submissionBody);
 
     return makeApiRequest(
@@ -116,7 +148,7 @@ export function ApiProvider({ children }: ApiProviderProps) {
   const approveSubmission = async (
     submissionBody: HttpApiExecSubmissionBody
   ): Promise<HttpApiExecSubmissionResponse> => {
-    console.log("Approving submission to:", apiUrl);
+    console.log("Approving submission to:", apiSettings.apiUrl);
     console.log("Submission body:", submissionBody);
 
     return makeApiRequest(
@@ -129,7 +161,7 @@ export function ApiProvider({ children }: ApiProviderProps) {
   const cancelSubmission = async (
     submissionBody: HttpApiCancelSubmissionBody
   ): Promise<HttpApiCancelSubmissionResponse> => {
-    console.log("Canceling submission to:", apiUrl);
+    console.log("Canceling submission to:", apiSettings.apiUrl);
     console.log("Submission body:", submissionBody);
 
     return makeApiRequest(
@@ -148,6 +180,8 @@ export function ApiProvider({ children }: ApiProviderProps) {
     approveSubmission,
     cancelSubmission,
     getMe,
+    apiSettings,
+    setApiSettings,
   };
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;

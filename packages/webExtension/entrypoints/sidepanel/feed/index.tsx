@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Rss } from "lucide-react";
 
-import { Button } from "../../../components/ui/button";
-import { Loading } from "../../../components/loading";
-import { useApi } from "../../../lib/ApiContext";
-import type { HttpApiGetMeResponse } from "../../../lib/ApiContext/types/httpUserApi/HttpApiGetMeResponse";
+import { Button } from "@/components/ui/button";
+import { Loading } from "@/components/loading";
+import { useApi } from "@/lib/ApiContext";
+import type { HttpApiGetMeResponse } from "@/lib/ApiContext/types/httpUserApi/HttpApiGetMeResponse";
 import { FeedElement } from "./feedElement";
 
 interface FeedPageProps {

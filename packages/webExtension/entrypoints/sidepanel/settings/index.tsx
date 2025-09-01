@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Save, Settings, LogOut } from "lucide-react";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 
 interface SettingsPageProps {
   onBack: () => void;

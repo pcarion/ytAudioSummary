@@ -1,5 +1,5 @@
-import { Button } from "../../../components/ui/button";
-import extensionLogo from "../../../assets/logo.svg";
+import { Button } from "@/components/ui/button";
+import extensionLogo from "@/assets/logo.svg";
 
 interface HeaderProps {
   userEmail?: string;
