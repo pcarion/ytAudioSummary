@@ -34,31 +34,40 @@ export const appRouter = router({
 			// Generate a unique submission ID
 			const submissionId = nanoid();
 
-			// Initialize database service
-			const db = new DatabaseService(ctx.env.YT_AUDIO_SUMMARY_DB);
-
-			// Create submission in database
-			const submission = await db.createSubmission({
-				id: submissionId,
-				url: input.url,
-				title: input.title,
-				thumbnailUrl: input.youtubeVideo?.thumbnails?.[0]?.url || null,
-				r2SubmissionPathName: `submissions/${submissionId}/submission.json`,
-				sender: input.sender,
-				status: "pending",
-			});
-
 			// Store submission metadata in R2 bucket
 			try {
-				await storeSubmissionMetadata(
+				const r2SubmissionPathName = await storeSubmissionMetadata(
 					ctx.env.YT_AUDIO_SUMMARY_BUCKET,
 					submissionId,
 					input
 				);
 				console.log(`Stored submission metadata for ${submissionId} in R2`);
+
+				// Initialize database service
+				const db = new DatabaseService(ctx.env.YT_AUDIO_SUMMARY_DB);
+
+				// Create submission in database
+				const submission = await db.createSubmission({
+					id: submissionId,
+					url: input.url,
+					title: input.title,
+					thumbnailUrl: input.youtubeVideo?.thumbnails?.[0]?.url || null,
+					r2SubmissionPathName: r2SubmissionPathName,
+					sender: input.sender,
+					status: "pending",
+				});
+				console.log(
+					`Created submission in database: ${JSON.stringify(submission)}`
+				);
 			} catch (error) {
-				console.error("Failed to store submission metadata in R2:", error);
-				// Continue with the response even if R2 storage fails
+				console.error("Failed to process submission:", error);
+				return {
+					success: false,
+					submissionId,
+					submissionUrl: input.url,
+					submissionTitle: input.title,
+					message: "failed: " + error,
+				};
 			}
 
 			return {

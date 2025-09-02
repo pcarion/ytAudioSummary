@@ -55,7 +55,7 @@ export async function storeSubmissionMetadata(
 	bucket: R2Bucket,
 	submissionId: string,
 	submission: SubmitContentInput
-): Promise<void> {
+): Promise<string> {
 	// Validate the submission data against the Zod schema
 	const validationResult = submitContentInput.safeParse(submission);
 
@@ -79,6 +79,8 @@ export async function storeSubmissionMetadata(
 			submissionId: submissionId,
 		},
 	});
+
+	return key;
 }
 
 /**
