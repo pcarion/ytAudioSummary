@@ -1,9 +1,9 @@
 import { Hono } from "hono";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { appRouter } from "./router";
+import { appRouter, type Context } from "./router";
 
 // Create Hono app
-const app = new Hono();
+const app = new Hono<{ Bindings: Env }>();
 
 // Add tRPC handler
 app.all("/trpc/*", async (c) => {
@@ -11,7 +11,9 @@ app.all("/trpc/*", async (c) => {
 		endpoint: "/trpc",
 		req: c.req.raw,
 		router: appRouter,
-		createContext: () => ({}),
+		createContext: (): Context => ({
+			env: c.env,
+		}),
 	});
 });
 

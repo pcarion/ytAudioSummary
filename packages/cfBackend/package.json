@@ -21,6 +21,7 @@
     "@trpc/server": "^11.0.0",
     "@yt-audio-summary/api-definition": "workspace:*",
     "hono": "^4.0.0",
+    "nanoid": "^5.1.5",
     "zod": "^3.22.0"
   },
   "devDependencies": {

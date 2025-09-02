@@ -9,7 +9,13 @@
   "compatibility_date": "2025-08-31",
   "observability": {
     "enabled": true
-  }
+  },
+  "r2_buckets": [
+    {
+      "binding": "YT_AUDIO_SUMMARY_BUCKET",
+      "bucket_name": "yt-audio-summary"
+    }
+  ],
   /**
    * Smart Placement
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

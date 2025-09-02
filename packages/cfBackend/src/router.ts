@@ -8,9 +8,16 @@ import {
 	cancelSubmissionResponse,
 	getMeResponse,
 } from "@yt-audio-summary/api-definition";
+import { storeSubmissionMetadata } from "./r2-utils";
+import { nanoid } from "nanoid";
 
-// Initialize tRPC
-const t = initTRPC.create();
+// Define the context type
+export interface Context {
+	env: Env;
+}
+
+// Initialize tRPC with context
+const t = initTRPC.context<Context>().create();
 const router = t.router;
 const publicProcedure = t.procedure;
 
@@ -20,32 +27,32 @@ export const appRouter = router({
 	submitContent: publicProcedure
 		.input(submitContentInput)
 		.output(submitContentResponse)
-		.mutation(async ({ input }) => {
+		.mutation(async ({ input, ctx }) => {
 			console.log("submitContent called with:", input);
 
 			// Generate a unique submission ID
-			const submissionId = `sub_${Date.now()}_${Math.random()
-				.toString(36)
-				.substring(2, 15)}`;
+			const submissionId = nanoid();
 
-			// Determine submission type based on content
-			const submissionType = input.youtubeVideo ? "youtube_video" : "web_page";
-
-			// Calculate credits cost (mock implementation)
-			const creditsCost = input.youtubeVideo ? 5 : 2;
+			// Store submission metadata in R2 bucket
+			try {
+				await storeSubmissionMetadata(
+					ctx.env.YT_AUDIO_SUMMARY_BUCKET,
+					submissionId,
+					input
+				);
+				console.log(`Stored submission metadata for ${submissionId} in R2`);
+			} catch (error) {
+				console.error("Failed to store submission metadata in R2:", error);
+				// Continue with the response even if R2 storage fails
+			}
 
 			// Mock response
 			return {
 				success: true,
 				submissionId,
-				submissionType,
 				submissionUrl: input.url,
 				submissionTitle: input.title,
 				message: "Content submitted successfully",
-				credits: {
-					current: 100 - creditsCost, // Mock current credits
-					creditsCost,
-				},
 			};
 		}),
 

@@ -54,14 +54,9 @@ export const cancelSubmissionInput = z.object({
 export const submitContentResponse = z.object({
 	success: z.boolean(),
 	submissionId: z.string(),
-	submissionType: z.string(),
 	submissionUrl: z.string(),
 	submissionTitle: z.string(),
 	message: z.string(),
-	credits: z.object({
-		current: z.number(),
-		creditsCost: z.number(),
-	}),
 });
 
 export const execSubmissionResponse = z.object({
