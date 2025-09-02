@@ -3,9 +3,8 @@ import { ArrowLeft, Rss } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/loading";
-import { useApi } from "@/lib/ApiContext";
 import { FeedElement } from "./feedElement";
-import type { GetMeResponse } from "@yt-audio-summary/api-definition";
+import { useApi, type GetMeOutput } from "@/lib/ApiContext";
 
 interface FeedPageProps {
   onBack: () => void;
@@ -14,7 +13,7 @@ interface FeedPageProps {
 export function FeedPage({ onBack }: FeedPageProps) {
   const { getMe } = useApi();
 
-  const [userData, setUserData] = useState<GetMeResponse | null>(null);
+  const [userData, setUserData] = useState<GetMeOutput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
