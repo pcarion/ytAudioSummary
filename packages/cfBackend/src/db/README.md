@@ -73,7 +73,55 @@ const result = await db
 
 ## Migration
 
-To set up the database schema, run the SQL migration:
+### Using Drizzle Kit (Recommended)
+
+Drizzle Kit provides powerful CLI tools for database management:
+
+#### Environment Setup
+
+For detailed setup instructions, see [DRIZZLE_SETUP.md](../../DRIZZLE_SETUP.md).
+
+Quick setup:
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit with your actual credentials
+nano .env
+```
+
+Required environment variables:
+```env
+CLOUDFLARE_ACCOUNT_ID=your_account_id_here
+CLOUDFLARE_DATABASE_ID=your_database_id_here
+CLOUDFLARE_D1_TOKEN=your_api_token_here
+```
+
+#### CLI Commands
+
+```bash
+# Check database configuration
+pnpm db:check
+
+# Generate migrations from schema changes
+pnpm db:generate
+
+# Apply migrations to D1 database
+pnpm db:push
+
+# Open Drizzle Studio (database GUI)
+pnpm db:studio
+
+# Drop database (use with caution)
+pnpm db:drop
+
+# Check migration status
+pnpm db:migrate
+```
+
+### Manual Migration
+
+To set up the database schema manually, run the SQL migration:
 
 ```bash
 # Apply the migration to your D1 database
