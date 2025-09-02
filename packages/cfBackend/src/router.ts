@@ -1,3 +1,4 @@
+import { v7 as uuidv7 } from "uuid";
 import { initTRPC } from "@trpc/server";
 import {
 	submitContentInput,
@@ -10,7 +11,6 @@ import {
 } from "@yt-audio-summary/api-definition";
 import { storeSubmissionMetadata } from "./r2-utils";
 import { DatabaseService } from "./db/queries";
-import { nanoid } from "nanoid";
 
 // Define the context type
 export interface Context {
@@ -32,7 +32,14 @@ export const appRouter = router({
 			console.log("submitContent called with:", input);
 
 			// Generate a unique submission ID
-			const submissionId = nanoid();
+			const submissionId = uuidv7();
+
+			// find thumbnail with max width and height
+			const thumbnailUrl =
+				input.youtubeVideo?.thumbnails?.reduce(
+					(max, thumbnail) => (thumbnail.width > max.width ? thumbnail : max),
+					input.youtubeVideo.thumbnails[0]
+				)?.url || "";
 
 			// Store submission metadata in R2 bucket
 			try {
@@ -51,7 +58,7 @@ export const appRouter = router({
 					id: submissionId,
 					url: input.url,
 					title: input.title,
-					thumbnailUrl: input.youtubeVideo?.thumbnails?.[0]?.url || null,
+					thumbnailUrl: thumbnailUrl,
 					r2SubmissionPathName: r2SubmissionPathName,
 					sender: input.sender,
 					status: "pending",
@@ -67,6 +74,7 @@ export const appRouter = router({
 					submissionUrl: input.url,
 					submissionTitle: input.title,
 					message: "failed: " + error,
+					thumbnailUrl: thumbnailUrl,
 				};
 			}
 
@@ -76,6 +84,7 @@ export const appRouter = router({
 				submissionUrl: input.url,
 				submissionTitle: input.title,
 				message: "Content submitted successfully",
+				thumbnailUrl: thumbnailUrl,
 			};
 		}),
 
@@ -158,6 +167,7 @@ export const appRouter = router({
 					: (sub.status as "pending" | "processing" | "completed" | "failed"),
 			url: sub.url,
 			title: sub.title,
+			thumbnailUrl: sub.thumbnailUrl,
 		}));
 
 		// Get all feed contents

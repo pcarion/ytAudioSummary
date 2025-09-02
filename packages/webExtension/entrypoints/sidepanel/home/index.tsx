@@ -114,6 +114,7 @@ export function Home({ onNavigateToFeed, onNavigateToSettings }: HomeProps) {
 							title: result.submissionTitle,
 							url: extractDomainFromUrl(result.submissionUrl),
 							date: "",
+							thumbnailUrl: result.thumbnailUrl,
 						});
 					}
 					console.log("Result:");

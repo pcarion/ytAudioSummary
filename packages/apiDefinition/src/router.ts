@@ -56,6 +56,7 @@ export const submitContentResponse = z.object({
 	submissionId: z.string(),
 	submissionUrl: z.string(),
 	submissionTitle: z.string(),
+	thumbnailUrl: z.string(),
 	message: z.string(),
 });
 
@@ -86,6 +87,7 @@ export const getMeResponse = z.object({
 			]),
 			url: z.string(),
 			title: z.string(),
+			thumbnailUrl: z.string(),
 		})
 	),
 	feedContents: z.array(

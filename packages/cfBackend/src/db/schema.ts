@@ -6,7 +6,7 @@ export const submissions = sqliteTable("submissions", {
 	id: text("id").primaryKey(), // submissionId
 	url: text("url").notNull(),
 	title: text("title").notNull(),
-	thumbnailUrl: text("thumbnail_url"),
+	thumbnailUrl: text("thumbnail_url").notNull(),
 	r2SubmissionPathName: text("r2_submission_path_name").notNull(),
 
 	// Sender information (stored as JSON)
