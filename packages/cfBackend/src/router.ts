@@ -9,6 +9,7 @@ import {
 	getMeResponse,
 } from "@yt-audio-summary/api-definition";
 import { storeSubmissionMetadata } from "./r2-utils";
+import { DatabaseService } from "./db/queries";
 import { nanoid } from "nanoid";
 
 // Define the context type
@@ -33,6 +34,20 @@ export const appRouter = router({
 			// Generate a unique submission ID
 			const submissionId = nanoid();
 
+			// Initialize database service
+			const db = new DatabaseService(ctx.env.YT_AUDIO_SUMMARY_DB);
+
+			// Create submission in database
+			const submission = await db.createSubmission({
+				id: submissionId,
+				url: input.url,
+				title: input.title,
+				thumbnailUrl: input.youtubeVideo?.thumbnails?.[0]?.url || null,
+				r2SubmissionPathName: `submissions/${submissionId}/submission.json`,
+				sender: input.sender,
+				status: "pending",
+			});
+
 			// Store submission metadata in R2 bucket
 			try {
 				await storeSubmissionMetadata(
@@ -46,7 +61,6 @@ export const appRouter = router({
 				// Continue with the response even if R2 storage fails
 			}
 
-			// Mock response
 			return {
 				success: true,
 				submissionId,
@@ -60,15 +74,20 @@ export const appRouter = router({
 	approveSubmission: publicProcedure
 		.input(execSubmissionInput)
 		.output(execSubmissionResponse)
-		.mutation(async ({ input }) => {
+		.mutation(async ({ input, ctx }) => {
 			console.log("approveSubmission called with:", input);
 
-			// Mock approval logic
-			// In a real implementation, this would:
-			// 1. Validate the submission exists
-			// 2. Check user permissions
-			// 3. Start processing the content
-			// 4. Update submission status
+			// Initialize database service
+			const db = new DatabaseService(ctx.env.YT_AUDIO_SUMMARY_DB);
+
+			// Get the submission
+			const submission = await db.getSubmissionById(input.submissionId);
+			if (!submission) {
+				throw new Error(`Submission ${input.submissionId} not found`);
+			}
+
+			// Mark as processing
+			await db.markSubmissionAsProcessing(input.submissionId);
 
 			return {
 				success: true,
@@ -80,15 +99,27 @@ export const appRouter = router({
 	cancelSubmission: publicProcedure
 		.input(cancelSubmissionInput)
 		.output(cancelSubmissionResponse)
-		.mutation(async ({ input }) => {
+		.mutation(async ({ input, ctx }) => {
 			console.log("cancelSubmission called with:", input);
 
-			// Mock cancellation logic
-			// In a real implementation, this would:
-			// 1. Validate the submission exists
-			// 2. Check if it can be cancelled
-			// 3. Stop processing if in progress
-			// 4. Update submission status
+			// Initialize database service
+			const db = new DatabaseService(ctx.env.YT_AUDIO_SUMMARY_DB);
+
+			// Get the submission
+			const submission = await db.getSubmissionById(input.submissionId);
+			if (!submission) {
+				throw new Error(`Submission ${input.submissionId} not found`);
+			}
+
+			// Check if submission can be cancelled
+			if (submission.status === "completed") {
+				throw new Error(
+					`Cannot cancel completed submission ${input.submissionId}`
+				);
+			}
+
+			// Cancel the submission
+			await db.cancelSubmission(input.submissionId);
 
 			return {
 				success: true,
@@ -97,36 +128,46 @@ export const appRouter = router({
 		}),
 
 	// Get user info
-	getMe: publicProcedure.output(getMeResponse).query(async () => {
+	getMe: publicProcedure.output(getMeResponse).query(async ({ ctx }) => {
 		console.log("getMe called");
 
-		// Mock user data
+		// Initialize database service
+		const db = new DatabaseService(ctx.env.YT_AUDIO_SUMMARY_DB);
+
+		// Get all submissions (since we removed user association)
+		const submissions = await db.getAllSubmissions(10);
+		const lastSubmissions = submissions.map((sub) => ({
+			submissionId: sub.id,
+			date: sub.createdAt,
+			approvalStatus:
+				sub.status === "pending"
+					? ("notConfirmed" as const)
+					: ("confirmed" as const),
+			submissionStatus:
+				sub.status === "cancelled"
+					? ("failed" as const)
+					: (sub.status as "pending" | "processing" | "completed" | "failed"),
+			url: sub.url,
+			title: sub.title,
+		}));
+
+		// Get all feed contents
+		const feedContents = await db.getFeedContents(10);
+		const feedContentsFormatted = feedContents.map((content) => ({
+			contentId: content.id,
+			title: content.title,
+			author: "YouTube Channel", // This would come from the submission data
+			pathToAudio: content.audioFileUrl || "/audio/default.mp3",
+			pathToImage: "/images/default.jpg", // This would be generated from thumbnails
+			originalContentUrl: content.url,
+		}));
 
 		return {
 			information: {
-				rssUrlPath: "/rss/user_123",
+				rssUrlPath: "/rss/global", // Global RSS since no user association
 			},
-			lastSubmissions: [
-				{
-					submissionId: "sub_123",
-					date: new Date().toISOString(),
-					approvalStatus: "notConfirmed" as const,
-					submissionStatus: "pending" as const,
-					url: "https://youtube.com/watch?v=example",
-					title: "Example YouTube Video",
-					creditsCost: 5,
-				},
-			],
-			feedContents: [
-				{
-					contentId: "content_456",
-					title: "Processed Audio Summary",
-					author: "YouTube Channel",
-					pathToAudio: "/audio/content_456.mp3",
-					pathToImage: "/images/content_456.jpg",
-					originalContentUrl: "https://youtube.com/watch?v=example",
-				},
-			],
+			lastSubmissions,
+			feedContents: feedContentsFormatted,
 			messages: [
 				{
 					message: "Welcome to YouTube Audio Summary!",
