@@ -16,6 +16,13 @@
       "bucket_name": "yt-audio-summary"
     }
   ],
+  "d1_databases": [
+    {
+      "binding": "YT_AUDIO_SUMMARY_DB",
+      "database_name": "yt-audio-summary",
+      "database_id": "68af2e02-d8ff-4c4e-bece-b6e902e55812"
+    }
+  ],
   /**
    * Smart Placement
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
