@@ -4,8 +4,8 @@
  * This module provides utility functions for interacting with the R2 bucket
  * to store and retrieve submission data, audio files, and other assets.
  */
-import { z } from "zod";
-import { SubmitContentInput, submitContentInput } from "./types";
+import type { z } from "zod";
+import { type SubmitContentInput, submitContentInput } from "./types";
 
 export interface AudioFileMetadata {
   submissionId: string;
@@ -36,13 +36,12 @@ export function validateSubmissionData(data: unknown):
       success: true,
       data: validationResult.data,
     };
-  } else {
-    return {
-      success: false,
-      error: `Validation failed: ${validationResult.error.message}`,
-      details: validationResult.error,
-    };
   }
+  return {
+    success: false,
+    error: `Validation failed: ${validationResult.error.message}`,
+    details: validationResult.error,
+  };
 }
 
 /**
@@ -127,7 +126,7 @@ export async function storeAudioFile(
   bucket: R2Bucket,
   submissionId: string,
   audioData: ArrayBuffer,
-  contentType: string = "audio/mpeg"
+  contentType = "audio/mpeg"
 ): Promise<string> {
   const key = `submissions/${submissionId}/audio.mp3`;
 
@@ -168,7 +167,7 @@ export async function getAudioFileUrl(
  */
 export async function listSubmissions(
   bucket: R2Bucket,
-  limit: number = 100
+  limit = 100
 ): Promise<SubmitContentInput[]> {
   const objects = await bucket.list({
     prefix: "submissions/",

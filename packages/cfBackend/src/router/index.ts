@@ -73,7 +73,7 @@ export const appRouter = router({
           submissionId,
           submissionUrl: input.url,
           submissionTitle: input.title,
-          message: "failed: " + error,
+          message: `failed: ${error}`,
           thumbnailUrl: thumbnailUrl,
         };
       }
