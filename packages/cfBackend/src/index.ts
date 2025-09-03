@@ -1,6 +1,12 @@
 /// <reference path="../worker-configuration.d.ts" />
 import app from "./trpc";
 
+// Export the Workflow
+export {
+  SubmissionWorkflow,
+  type SubmissionWorkflowParams,
+} from "./worflows/SubmissionWorflow";
+
 export default {
   async fetch(
     request: Request,

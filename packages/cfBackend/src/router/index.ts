@@ -12,6 +12,7 @@ import {
 } from "./types";
 import { storeSubmissionMetadata } from "./r2-utils";
 import { DatabaseService } from "../db/queries";
+import { SubmissionWorkflowParams } from "..";
 
 // Define the context type
 export interface Context {
@@ -105,12 +106,19 @@ export const appRouter = router({
         throw new Error(`Submission ${input.submissionId} not found`);
       }
 
-      // Mark as processing
-      await db.markSubmissionAsProcessing(input.submissionId);
+      // // Mark as processing
+      // await db.markSubmissionAsProcessing(input.submissionId);
+      // Start the workflow
+      const params: SubmissionWorkflowParams = {
+        submissionId: input.submissionId,
+      };
+      const workflowInstance = await ctx.env.SUBMISSION_WORKFLOW.create({
+        params,
+      });
 
       return {
         success: true,
-        message: `Submission ${input.submissionId} approved and processing started`,
+        message: `Submission ${input.submissionId} approved and processing started, workflow instance: ${workflowInstance.id}`,
       };
     }),
 

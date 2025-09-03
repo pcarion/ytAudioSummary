@@ -1,3 +1,15 @@
+# AI SDKs
+
+AI Gateway:
+https://developers.cloudflare.com/ai-gateway/get-started/
+
+List of providers:
+https://developers.cloudflare.com/ai-gateway/usage/providers/
+
+For instance, Google AI:
+https://developers.cloudflare.com/ai-gateway/usage/providers/google-ai-studio/
+
+
 # database / drizzle commands
 
 ## Available Commands

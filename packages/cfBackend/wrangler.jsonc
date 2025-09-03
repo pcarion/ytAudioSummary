@@ -23,6 +23,16 @@
       "database_id": "68af2e02-d8ff-4c4e-bece-b6e902e55812"
     }
   ],
+  "workflows": [
+    {
+      "name": "submission-workflow",
+      "binding": "SUBMISSION_WORKFLOW",
+      "class_name": "SubmissionWorkflow",
+    }
+  ],
+  "vars": {
+    "CF_ACCOUNT_ID": "ae52d7a5adc1336641bc0c622258b947"
+  },
   /**
    * Smart Placement
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

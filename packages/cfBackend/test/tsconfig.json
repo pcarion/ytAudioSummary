@@ -4,5 +4,10 @@
 		"types": ["@cloudflare/vitest-pool-workers"]
 	},
 	"include": ["./**/*.ts", "../worker-configuration.d.ts"],
-	"exclude": []
+	"exclude": [],
+    "paths": {
+        "cloudflare:workers": ["./node_modules/@cloudflare/workers-types"],
+        "src/*": ["src/*"]
+    },
+
 }
