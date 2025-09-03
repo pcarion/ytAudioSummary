@@ -1,3 +1,4 @@
+/// <reference path="../../worker-configuration.d.ts" />
 import { v7 as uuidv7 } from "uuid";
 import { initTRPC } from "@trpc/server";
 import {

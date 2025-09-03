@@ -1,13 +1,16 @@
 import { GetPageContent } from "@/lib/types/messages";
 import { BrowserInfo } from "../browserInfo";
-import { HttpApiSubmitContentBody } from "../ApiContext/types/httpContentSubmission/HttpApiSubmitContentBody";
+import { SubmitContentInput } from "../ApiContext";
 
 export interface PageContentArgs {
   browserInfo: BrowserInfo;
 }
 
-export function pageContentToApiSubmission(pageContent: GetPageContent, args: PageContentArgs): HttpApiSubmitContentBody {
-  console.log('pageContentToApiSubmission');
+export function pageContentToApiSubmission(
+  pageContent: GetPageContent,
+  args: PageContentArgs
+): SubmitContentInput {
+  console.log("pageContentToApiSubmission");
   console.log(pageContent);
   return {
     url: pageContent.pageInformation.url,
@@ -33,5 +36,5 @@ export function pageContentToApiSubmission(pageContent: GetPageContent, args: Pa
       osName: args.browserInfo.osName,
       userAgent: args.browserInfo.userAgent,
     },
-  }
+  };
 }

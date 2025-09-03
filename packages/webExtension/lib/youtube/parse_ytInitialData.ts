@@ -13,27 +13,38 @@ interface YtInitialDataInformation {
 // on disk at:
 // $HOME/Library/Application Support/Google/Chrome/Default/Extensions/mpfdnefhgmjlbkphfpkiicdaegfanbab/1.2.0_0
 //
-export async function parse_ytInitialData(ytInitialData: any): Promise<YtInitialDataInformation> {
+export async function parse_ytInitialData(
+  ytInitialData: any
+): Promise<YtInitialDataInformation> {
   const response: YtInitialDataInformation = {
     hasTranscript: false,
-    language: '',
-    transcript: '',
+    language: "",
+    transcript: "",
   };
   if (!ytInitialData) {
     return response;
   }
   // search for the transcript panel
-  const continuationParams = ytInitialData.engagementPanels?.find((p: any) =>
-    p.engagementPanelSectionListRenderer?.content?.continuationItemRenderer?.continuationEndpoint?.getTranscriptEndpoint
-  )?.engagementPanelSectionListRenderer?.content?.continuationItemRenderer?.continuationEndpoint?.getTranscriptEndpoint?.params;
+  const continuationParams = ytInitialData.engagementPanels?.find(
+    (p: any) =>
+      p.engagementPanelSectionListRenderer?.content?.continuationItemRenderer
+        ?.continuationEndpoint?.getTranscriptEndpoint
+  )?.engagementPanelSectionListRenderer?.content?.continuationItemRenderer
+    ?.continuationEndpoint?.getTranscriptEndpoint?.params;
 
   if (!continuationParams) {
     return response;
   }
 
-  const hl = ytInitialData.topbar?.desktopTopbarRenderer?.searchbox?.fusionSearchboxRenderer?.config?.webSearchboxConfig?.requestLanguage || "en";
-  const clientData = ytInitialData.responseContext?.serviceTrackingParams?.[0]?.params;
-  const visitorData = ytInitialData.responseContext?.webResponseContextExtensionData?.ytConfigData?.visitorData;
+  const hl =
+    ytInitialData.topbar?.desktopTopbarRenderer?.searchbox
+      ?.fusionSearchboxRenderer?.config?.webSearchboxConfig?.requestLanguage ||
+    "en";
+  const clientData =
+    ytInitialData.responseContext?.serviceTrackingParams?.[0]?.params;
+  const visitorData =
+    ytInitialData.responseContext?.webResponseContextExtensionData?.ytConfigData
+      ?.visitorData;
 
   const body = {
     context: {
@@ -41,31 +52,37 @@ export async function parse_ytInitialData(ytInitialData: any): Promise<YtInitial
         hl,
         visitorData,
         clientName: clientData?.[0]?.value,
-        clientVersion: clientData?.[1]?.value
+        clientVersion: clientData?.[1]?.value,
       },
-      request: { useSsl: true }
+      request: { useSsl: true },
     },
-    params: continuationParams
+    params: continuationParams,
   };
 
-
   // let's get the transcript
-  console.log('body:');
+  console.log("body:");
   console.log(body);
 
-  const res = await fetch("https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
+  const res = await fetch(
+    "https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }
+  );
 
-  const json = await res.json();
-  console.log('json from get_transcript:');
-  console.log(json);
+  const resJson = await res.json();
+  console.log("json from get_transcript:");
+  console.log(resJson);
+  const json = resJson as any;
 
-  const segments = json.actions?.[0]?.updateEngagementPanelAction?.content?.transcriptRenderer?.content?.transcriptSearchPanelRenderer?.body?.transcriptSegmentListRenderer?.initialSegments || [];
+  const segments =
+    json.actions?.[0]?.updateEngagementPanelAction?.content?.transcriptRenderer
+      ?.content?.transcriptSearchPanelRenderer?.body
+      ?.transcriptSegmentListRenderer?.initialSegments || [];
 
-  console.log('segments:');
+  console.log("segments:");
   console.log(segments);
 
   // TODO: format may be different for shorts
@@ -75,15 +92,18 @@ export async function parse_ytInitialData(ytInitialData: any): Promise<YtInitial
     const lines: string[] = [];
     for (const segment of segments) {
       if (segment.transcriptSegmentRenderer) {
-        const text = segment.transcriptSegmentRenderer.snippet?.runs?.map((r: any) => r.text).join(" ") || "";
+        const text =
+          segment.transcriptSegmentRenderer.snippet?.runs
+            ?.map((r: any) => r.text)
+            .join(" ") || "";
         lines.push(text);
       }
     }
-    response.transcript = lines.join(' ');
+    response.transcript = lines.join(" ");
     response.language = hl;
     response.hasTranscript = true;
   }
-  return  response;
+  return response;
 }
 
 // segments:
@@ -140,5 +160,3 @@ export async function parse_ytInitialData(ytInitialData: any): Promise<YtInitial
 ]
 
 */
-
-

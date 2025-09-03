@@ -1,9 +1,4 @@
-/**
- * R2 Storage Utilities for YouTube Audio Summary
- *
- * This module provides utility functions for interacting with the R2 bucket
- * to store and retrieve submission data, audio files, and other assets.
- */
+/// <reference path="../../worker-configuration.d.ts" />
 import type { z } from "zod";
 import { type SubmitContentInput, submitContentInput } from "./types";
 
