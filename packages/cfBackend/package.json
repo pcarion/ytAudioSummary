@@ -24,8 +24,8 @@
     "db:check": "drizzle-kit check"
   },
   "dependencies": {
+    "@google/genai": "^1.17.0",
     "@trpc/server": "^11.0.0",
-    "@yt-audio-summary/api-definition": "workspace:*",
     "drizzle-orm": "^0.44.2",
     "hono": "^4.0.0",
     "nanoid": "^5.1.5",
