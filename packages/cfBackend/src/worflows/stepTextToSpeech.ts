@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 
-export async function step03TextToSpeech(
+export async function stepTextToSpeechGoogleGenAI(
   submissionId: string,
   inputText: string,
   voiceName: string,

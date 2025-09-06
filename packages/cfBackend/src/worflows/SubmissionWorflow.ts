@@ -4,10 +4,9 @@ import {
   WorkflowEvent,
   WorkflowStep,
 } from "cloudflare:workers";
-import { GoogleGenAI } from "@google/genai";
-import { step01RetrieveSubmission } from "./step01RetrieveSubmission";
-import { step02Summarize } from "./step02Summarize";
-import { step03TextToSpeech } from "./step03TextToSpeech";
+import { stepRetrieveSubmissionFromR2 } from "./stepRetrieveSubmission";
+import { stepSummarizeWithGoogleGenAI } from "./stepSummarize";
+import { stepTextToSpeechGoogleGenAI } from "./stepTextToSpeech";
 
 export interface SubmissionWorkflowParams {
   submissionId: string;
@@ -46,7 +45,7 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
       const videoInformation: VideoInformation = await step.do(
         "retrieve submission",
         async () => {
-          const submission = await step01RetrieveSubmission(
+          const submission = await stepRetrieveSubmissionFromR2(
             submissionId,
             this.env.YT_AUDIO_SUMMARY_BUCKET
           );
@@ -64,7 +63,7 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
           },
         },
         async () => {
-          const summarizationInformatiom = await step02Summarize(
+          const summarizationInformatiom = await stepSummarizeWithGoogleGenAI(
             submissionId,
             this.env.YT_AUDIO_SUMMARY_BUCKET,
             videoInformation.title,
@@ -86,7 +85,7 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
           },
         },
         async () => {
-          const ttsInformation = await step03TextToSpeech(
+          const ttsInformation = await stepTextToSpeechGoogleGenAI(
             submissionId,
             summarizationInformatiom.summary,
             voiceName,

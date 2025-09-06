@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 
-export async function step02Summarize(
+export async function stepSummarizeWithGoogleGenAI(
   submissionId: string,
   bucket: R2Bucket,
   title: string,

@@ -1,6 +1,6 @@
 import { ElevenLabsClient, play } from "@elevenlabs/elevenlabs-js";
 
-export async function step04TextToSpeechElevenLabs(
+export async function stepTextToSpeechWithElevenLabs(
   submissionId: string,
   inputText: string,
   elevenLabsApiToken: string,

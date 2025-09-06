@@ -1,6 +1,6 @@
 import { getSubmissionById } from "../router/r2-utils";
 
-export async function step01RetrieveSubmission(
+export async function stepRetrieveSubmissionFromR2(
   submissionId: string,
   bucket: R2Bucket
 ) {
