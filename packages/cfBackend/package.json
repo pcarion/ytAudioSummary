@@ -24,6 +24,7 @@
     "db:check": "drizzle-kit check"
   },
   "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.14.0",
     "@google-cloud/text-to-speech": "^6.3.0",
     "@google/genai": "^1.17.0",
     "@trpc/server": "^11.0.0",

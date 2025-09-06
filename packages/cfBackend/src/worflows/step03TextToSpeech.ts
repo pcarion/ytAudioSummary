@@ -136,7 +136,7 @@ export async function step03TextToSpeech(
 }
 
 // replace characters like \n, \r, \t, * _ - etc. and trim the text
-function cleanupText(text: string) {
+export function cleanupText(text: string) {
   return text
     .replace(/[\n\r\t\*_\-\+\[\]\(\)\{\}\.\?!]+/g, " ")
     .replace(/\s+/g, " ")
