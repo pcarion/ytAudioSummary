@@ -7,6 +7,9 @@ export {
   type SubmissionWorkflowParams,
 } from "./worflows/SubmissionWorflow";
 
+// Export the TextToSpeechContainer
+export { TextToSpeechContainer } from "./containers/TextToSpeechContainer";
+
 export default {
   async fetch(
     request: Request,

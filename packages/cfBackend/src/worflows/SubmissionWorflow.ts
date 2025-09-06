@@ -7,6 +7,8 @@ import {
 import { stepRetrieveSubmissionFromR2 } from "./stepRetrieveSubmission";
 import { stepSummarizeWithGoogleGenAI } from "./stepSummarize";
 import { stepTextToSpeechGoogleGenAI } from "./stepTextToSpeech";
+import { stepTextToSpeechContainer } from "./stepTextToSpeechContainer";
+import { TextToSpeechContainer } from "../containers/TextToSpeechContainer";
 
 export interface SubmissionWorkflowParams {
   submissionId: string;
@@ -39,6 +41,13 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
         throw new Error("GOOGLEAI_API_KEY is not set");
       }
 
+      const container = this.env.TEXT_TO_SPEECH_CONTAINER.get(
+        this.env.TEXT_TO_SPEECH_CONTAINER.idFromName(event.instanceId)
+      );
+      if (!container) {
+        throw new Error("TEXT_TO_SPEECH_CONTAINER is not set");
+      }
+
       // Define one or more steps that optionally return state.
       // Can access bindings on `this.env`
       // Can access params on `event.payload`
@@ -50,6 +59,27 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
             this.env.YT_AUDIO_SUMMARY_BUCKET
           );
           return submission;
+        }
+      );
+
+      // call text to speech container
+      const ttsInformation = await step.do(
+        "text to speech container",
+        {
+          retries: {
+            limit: 0,
+            delay: 1000,
+            backoff: "exponential",
+          },
+        },
+        async () => {
+          console.log("Calling text to speech container");
+          return await stepTextToSpeechContainer(
+            submissionId,
+            videoInformation.captions,
+            voiceName,
+            container as DurableObjectStub<TextToSpeechContainer>
+          );
         }
       );
 
