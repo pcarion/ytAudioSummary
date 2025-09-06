@@ -1,3 +1,4 @@
+/// <reference path="../../worker-configuration.d.ts" />
 import { ElevenLabsClient, play } from "@elevenlabs/elevenlabs-js";
 
 export async function stepTextToSpeechWithElevenLabs(
