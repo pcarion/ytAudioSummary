@@ -8,7 +8,6 @@ import { GoogleGenAI } from "@google/genai";
 import { step01RetrieveSubmission } from "./step01RetrieveSubmission";
 import { step02Summarize } from "./step02Summarize";
 import { step03TextToSpeech } from "./step03TextToSpeech";
-import { step04TextToSpeechElevenLabs } from "./step04TextToSpeechElevenLabs";
 
 export interface SubmissionWorkflowParams {
   submissionId: string;
@@ -87,14 +86,11 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
           },
         },
         async () => {
-          const elevenLabsApiToken = (this.env as any).ELEVENLABS_API_KEY;
-          if (!elevenLabsApiToken) {
-            throw new Error("ELEVENLABS_API_KEY is not set");
-          }
-          const ttsInformation = await step04TextToSpeechElevenLabs(
+          const ttsInformation = await step03TextToSpeech(
             submissionId,
             summarizationInformatiom.summary,
-            elevenLabsApiToken,
+            voiceName,
+            googleAiApiToken,
             this.env.YT_AUDIO_SUMMARY_BUCKET
           );
           return ttsInformation;

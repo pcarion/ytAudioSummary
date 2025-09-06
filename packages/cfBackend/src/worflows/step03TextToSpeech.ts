@@ -7,10 +7,6 @@ export async function step03TextToSpeech(
   googleAiApiToken: string,
   bucket: R2Bucket
 ) {
-  // Add timeout wrapper for TTS generation
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error("TTS generation timeout")), 900000); // 15 minutes timeout
-  });
   const cleanSummary = cleanupText(inputText);
   // write clean summary to r2 bucket
   const key = `submissions/${submissionId}/clean_summary.txt`;
@@ -34,48 +30,26 @@ export async function step03TextToSpeech(
 
   console.log("Processing TTS with text length:", cleanSummary.length);
 
-  const ttsGeneration = async () => {
-    let response;
-    try {
-      response = await ai.models.generateContent({
-        model: "gemini-2.5-flash-preview-tts",
-        contents: [
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash-preview-tts",
+    contents: [
+      {
+        parts: [
           {
-            parts: [
-              {
-                text: `Read aloud in a warm, welcoming tone: ${cleanSummary}`,
-              },
-            ],
+            text: `Read aloud in a warm, welcoming tone: ${cleanSummary}`,
           },
         ],
-        config: {
-          responseModalities: ["AUDIO"],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: { voiceName },
-            },
-          },
+      },
+    ],
+    config: {
+      responseModalities: ["AUDIO"],
+      speechConfig: {
+        voiceConfig: {
+          prebuiltVoiceConfig: { voiceName },
         },
-      });
-    } catch (error: any) {
-      console.error("TTS generation failed:", {
-        error: error.message,
-        code: error.code,
-        status: error.status,
-        cleanSummaryLength: cleanSummary.length,
-        summaryLength: inputText.length,
-      });
-
-      throw error;
-    }
-    return response;
-  };
-
-  const response = (await Promise.race([
-    ttsGeneration(),
-    timeoutPromise,
-  ])) as any;
-
+      },
+    },
+  });
   console.log("TTS response structure", {
     candidates: response.candidates?.length || 0,
     hasContent: !!response.candidates?.[0]?.content,
