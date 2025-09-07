@@ -1,0 +1,1 @@
+ALTER TABLE `feed_contents` ADD `thumbnail_url` text;

@@ -1,0 +1,167 @@
+### YouTube Audio Summary API - Testing
+###
+### To start the local development server:
+### 1. cd packages/cfBackend
+### 2. pnpm dev
+### 3. The server will start on a random port (check console output)
+###
+### Note: tRPC endpoints use POST requests with JSON payloads
+### The "0" key in the JSON contains the input parameters
+
+### API Configuration
+## @baseUrl = http://localhost:59941
+### Alternative URLs:
+@baseUrl = https://yt-audio-summary.pcarion.workers.dev
+### @baseUrl = https://your-production-domain.com
+### @baseUrl = https://your-staging-domain.com
+
+### Health Check
+GET {{baseUrl}}/health
+Content-Type: application/json
+
+###
+
+### Submit Content (YouTube Video)
+POST {{baseUrl}}/trpc/submitContent
+Content-Type: application/json
+
+{
+    "url": "https://youtube.com/watch?v=dQw4w9WgXcQ",
+    "title": "Rick Astley - Never Gonna Give You Up",
+    "domain": "youtube.com",
+    "pathName": "/watch",
+    "youtubeVideo": {
+      "videoId": "dQw4w9WgXcQ",
+      "title": "Rick Astley - Never Gonna Give You Up",
+      "author": "Rick Astley",
+      "shortDescription": "The official video for \"Never Gonna Give You Up\" by Rick Astley",
+      "captions": "Never gonna give you up, never gonna let you down...",
+      "isLiveContent": false,
+      "lengthSeconds": "212",
+      "channelId": "UCuAXFkgsw1L7xaCfnd5JJOw",
+      "thumbnails": [
+        {
+          "url": "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
+          "width": 1280,
+          "height": 720
+        }
+      ]
+    },
+    "metadata": [
+      {
+        "name": "description",
+        "value": "The official video for Never Gonna Give You Up by Rick Astley"
+      },
+      {
+        "name": "keywords",
+        "value": "rick astley, never gonna give you up, music video"
+      }
+    ],
+    "sender": {
+      "appName": "YouTube Audio Summary Extension",
+      "appVersion": "1.0.0",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "osName": "macOS",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+    }
+}
+
+###
+
+### Submit Content (Web Page)
+POST {{baseUrl}}/trpc/submitContent
+Content-Type: application/json
+
+{
+    "url": "https://example.com/article",
+    "title": "Example Article Title!",
+    "domain": "example.com",
+    "pathName": "/article",
+    "metadata": [
+      {
+        "name": "description",
+        "value": "This is an example article for testing"
+      },
+      {
+        "name": "author",
+        "value": "John Doe"
+      }
+    ],
+    "sender": {
+      "appName": "YouTube Audio Summary Extension",
+      "appVersion": "1.0.0",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "osName": "macOS",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+    }
+
+}
+
+###
+
+### Approve Submission
+POST {{baseUrl}}/trpc/approveSubmission
+Content-Type: application/json
+
+{
+	"submissionId": "sub_1705312200000_abc123def456"
+}
+
+###
+
+### Cancel Submission
+POST {{baseUrl}}/trpc/cancelSubmission
+Content-Type: application/json
+
+{
+	"submissionId": "sub_1705312200000_abc123def456"
+}
+
+###
+
+### Get User Info
+GET {{baseUrl}}/trpc/getMe
+Content-Type: application/json
+
+###
+
+###
+
+### Test with Authorization Header
+GET {{baseUrl}}/trpc/getMe
+Content-Type: application/json
+Authorization: Bearer your-api-token-here
+
+{}
+
+###
+
+### Test Error Handling - Invalid URL
+POST {{baseUrl}}/trpc/submitContent
+Content-Type: application/json
+
+{
+		"url": "invalid-url",
+		"title": "Test with Invalid URL",
+		"domain": "invalid.com",
+		"pathName": "/test",
+		"metadata": [],
+		"sender": {
+			"appName": "YouTube Audio Summary Extension",
+			"appVersion": "1.0.0",
+			"timestamp": "2024-01-15T10:30:00Z",
+			"osName": "macOS",
+			"userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+		}
+}
+
+###
+
+### Test Error Handling - Missing Required Fields
+POST {{baseUrl}}/trpc/submitContent
+Content-Type: application/json
+
+{
+	"url": "https://example.com",
+	"title": "Missing Fields Test"
+}

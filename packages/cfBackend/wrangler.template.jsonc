@@ -1,0 +1,94 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "yt-audio-summary",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-08-31",
+  "observability": {
+    "enabled": true
+  },
+  "r2_buckets": [
+    {
+      "binding": "YT_AUDIO_SUMMARY_BUCKET",
+      "bucket_name": "yt-audio-summary"
+    },
+    {
+      "binding": "YT_PUBLIC_BUCKET",
+      "bucket_name": "yt-public"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "YT_AUDIO_SUMMARY_DB",
+      "database_name": "yt-audio-summary",
+      "database_id": "68af2e02-d8ff-4c4e-bece-b6e902e55812"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "submission-workflow",
+      "binding": "SUBMISSION_WORKFLOW",
+      "class_name": "SubmissionWorkflow",
+    }
+  ],
+  "vars": {
+    "CF_ACCOUNT_ID": "$CF_ACCOUNT_ID",
+    "R2_PUBLIC_ACCESS_KEY_ID": "$R2_PUBLIC_ACCESS_KEY_ID",
+    "R2_PUBLIC_BUCKET_NAME": "yt-public",
+    "R2_PUBLIC_PREFIX_URL": "$R2_PUBLIC_PREFIX_URL"
+  },
+  "containers": [
+    {
+      "class_name": "TextToSpeechContainer",
+      "image": "./Dockerfile",
+      "max_instances": 10
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "TextToSpeechContainer",
+        "name": "TEXT_TO_SPEECH_CONTAINER"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "new_sqlite_classes": ["TextToSpeechContainer"],
+      "tag": "v1"
+    }
+  ]
+  /**
+   * Smart Placement
+   * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
+   */
+  // "placement": { "mode": "smart" }
+  /**
+   * Bindings
+   * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
+   * databases, object storage, AI inference, real-time communication and more.
+   * https://developers.cloudflare.com/workers/runtime-apis/bindings/
+   */
+  /**
+   * Environment Variables
+   * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
+   */
+  // "vars": { "MY_VARIABLE": "production_value" }
+  /**
+   * Note: Use secrets to store sensitive data.
+   * https://developers.cloudflare.com/workers/configuration/secrets/
+   */
+  /**
+   * Static Assets
+   * https://developers.cloudflare.com/workers/static-assets/binding/
+   */
+  // "assets": { "directory": "./public/", "binding": "ASSETS" }
+  /**
+   * Service Bindings (communicate between multiple Workers)
+   * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
+   */
+  // "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
+}

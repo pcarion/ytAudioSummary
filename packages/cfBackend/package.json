@@ -1,0 +1,47 @@
+{
+  "name": "@yt-audio-summary/cf-backend",
+  "description": "YouTube Audio Summary Cloudflare Backend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "test": "vitest",
+    "cf-wrangler-jsonc": "scripts/mkWrangleJsonc.sh",
+    "cf-typegen": "pnpm run cf-wrangler-jsonc && wrangler types",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format .",
+    "format:fix": "biome format --write .",
+    "type-check": "tsc --noEmit",
+    "verify": "pnpm lint && pnpm type-check && pnpm build",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:drop": "drizzle-kit drop",
+    "db:check": "drizzle-kit check"
+  },
+  "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.14.0",
+    "@google-cloud/text-to-speech": "^6.3.0",
+    "@google/genai": "^1.17.0",
+    "@trpc/server": "^11.0.0",
+    "drizzle-orm": "^0.44.2",
+    "hono": "^4.0.0",
+    "nanoid": "^5.1.5",
+    "uuid": "^11.1.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.0",
+    "@cloudflare/vitest-pool-workers": "^0.8.19",
+    "dotenv": "^16.4.5",
+    "drizzle-kit": "^0.31.4",
+    "typescript": "^5.5.2",
+    "vitest": "~3.2.0",
+    "wrangler": "^4.34.0"
+  }
+}
