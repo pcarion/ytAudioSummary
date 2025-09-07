@@ -2,12 +2,11 @@ import { GoogleGenAI } from "@google/genai";
 
 export async function stepTextToSpeechGoogleGenAI(
   submissionId: string,
-  inputText: string,
+  cleanSummary: string,
   voiceName: string,
   googleAiApiToken: string,
   bucket: R2Bucket
 ) {
-  const cleanSummary = cleanupText(inputText);
   // write clean summary to r2 bucket
   const key = `submissions/${submissionId}/clean_summary.txt`;
   await bucket.put(key, cleanSummary, {
@@ -104,17 +103,9 @@ export async function stepTextToSpeechGoogleGenAI(
     fileName,
     mimeType,
     size: wavBuffer.length,
-    textLength: inputText.length,
+    textLength: cleanSummary.length,
     voiceName,
   };
-}
-
-// replace characters like \n, \r, \t, * _ - etc. and trim the text
-export function cleanupText(text: string) {
-  return text
-    .replace(/[\n\r\t\*_\-\+\[\]\(\)\{\}\.\?!]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
 }
 
 // A helper function to create a WAV header for raw PCM data

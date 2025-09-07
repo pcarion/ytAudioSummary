@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -15,10 +16,57 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	country := os.Getenv("CLOUDFLARE_COUNTRY_A2")
 	location := os.Getenv("CLOUDFLARE_LOCATION")
 	region := os.Getenv("CLOUDFLARE_REGION")
-    message := os.Getenv("MESSAGE")
 	instanceId := os.Getenv("CLOUDFLARE_DEPLOYMENT_ID")
+    body, _ := io.ReadAll(r.Body)
+    // parse body as json
+    var bodyMap map[string]any
+    json.Unmarshal(body, &bodyMap)
+    log.Println("Handler called")
+    log.Println("Request:", bodyMap)
+    log.Println("Request:", string(body))
 
-	fmt.Fprintf(w, "Hi, I'm a container and this is my message: \"%s\", my instance ID is: %s , my country is: %s, my location is: %s, my region is: %s", message, instanceId, country, location, region)
+    submissionId := bodyMap["submissionId"].(string)
+    if submissionId == "" {
+        log.Println("submissionId is required")
+        http.Error(w, "submissionId is required", http.StatusBadRequest)
+        return
+    }
+    text := bodyMap["text"].(string)
+    if text == "" {
+        log.Println("text is required")
+        http.Error(w, "text is required", http.StatusBadRequest)
+        return
+    }
+    processing := NewProcessing(bodyMap["text"].(string))
+    processing.WithApiKey(bodyMap["elevenLabsApiToken"].(string))
+    processing.WithVoiceIx(0)
+    processing.WithOutputFileName("episode.mp3")
+    processing.WithR2BucketName(bodyMap["r2BucketName"].(string))
+    processing.WithR2AccessKeyId(bodyMap["r2AccessKeyId"].(string))
+    processing.WithR2SecretAccessKey(bodyMap["r2SecretAccessKey"].(string))
+    processing.WithR2AccountId(bodyMap["r2AccountId"].(string))
+    processing.WithR2Prefix(bodyMap["r2Prefix"].(string))
+
+    // process the text to speech
+    r2Key, err := processing.Process()
+    if err != nil {
+        log.Println("Error in processing:", err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+
+    // return JSON response
+    response := map[string]any{
+        "region": region,
+        "instanceId": instanceId,
+        "country": country,
+        "location": location,
+        "submissionId": submissionId,
+        "r2Key": r2Key,
+    }
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(response)
 }
 
 func main() {
@@ -43,6 +91,7 @@ func main() {
 	router := http.NewServeMux()
 	router.HandleFunc("POST /process", handler)
 	router.HandleFunc("/_health", func(w http.ResponseWriter, r *http.Request) {
+        log.Println("Health check called")
 		if terminate {
 			w.WriteHeader(400)
 			w.Write([]byte("draining"))

@@ -41,8 +41,17 @@ export async function stepSummarizeWithGoogleGenAI(
   // Return only serializable data
   return {
     summary: summary,
+    cleanedSummary: cleanupText(summary),
     model: response.modelVersion || "unknown",
     finishReason: response.candidates?.[0]?.finishReason,
     usage: response.usageMetadata,
   };
+}
+
+// replace characters like \n, \r, \t, * _ - etc. and trim the text
+function cleanupText(text: string) {
+  return text
+    .replace(/[\n\r\t\*_\-\+\[\]\(\)\{\}\.\?!]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }

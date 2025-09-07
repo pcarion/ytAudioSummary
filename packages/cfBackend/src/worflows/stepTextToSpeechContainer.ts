@@ -6,8 +6,15 @@ export function sleep(ms: number) {
 }
 export async function stepTextToSpeechContainer(
   submissionId: string,
-  inputText: string,
-  voiceName: string,
+  cleanSummary: string,
+  elevenLabsApiToken: string,
+  bucket: {
+    accessKeyId: string;
+    secretAccessKey: string;
+    bucketName: string;
+    prefix: string;
+    accountId: string;
+  },
   container: DurableObjectStub<TextToSpeechContainer>
 ) {
   const tries = 10;
@@ -39,9 +46,14 @@ export async function stepTextToSpeechContainer(
 
   try {
     const body = JSON.stringify({
-      text: inputText,
-      voiceName: voiceName,
+      text: cleanSummary,
+      elevenLabsApiToken: elevenLabsApiToken,
       submissionId: submissionId,
+      r2BucketName: bucket.bucketName,
+      r2AccessKeyId: bucket.accessKeyId,
+      r2SecretAccessKey: bucket.secretAccessKey,
+      r2Prefix: bucket.prefix,
+      r2AccountId: bucket.accountId,
     });
     console.log("Sending request to container...");
     const result = await container.fetch(
@@ -51,7 +63,33 @@ export async function stepTextToSpeechContainer(
       })
     );
     console.log("Response from container:");
-    console.log(JSON.stringify(result, null, 2));
+    if (!result.ok) {
+      const text = await result.text();
+      const status = result.status;
+      const statusText = result.statusText;
+      console.error(
+        "Failed to process text to speech",
+        text,
+        status,
+        statusText
+      );
+      throw new Error("Failed to process text to speech");
+    }
+    const json = await result.json();
+    const jsonAny = json as any;
+    const r = {
+      response: json,
+      status: result.status,
+      statusText: result.statusText,
+      headers: result.headers,
+      url: result.url,
+      ok: result.ok,
+      redirected: result.redirected,
+      cf: result.cf,
+      r2Key: jsonAny.r2Key,
+    };
+    console.log("response is:", JSON.stringify(r, null, 2));
+    return r;
   } catch (err) {
     console.error(
       "There was an error processing the text to speech",
