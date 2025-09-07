@@ -27,51 +27,50 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
     event: WorkflowEvent<SubmissionWorkflowParams>,
     step: WorkflowStep
   ) {
+    const submissionId = event.payload.submissionId;
+
+    const accountId = this.env.CF_ACCOUNT_ID;
+    if (!accountId) {
+      throw new Error("CF_ACCOUNT_ID is not set");
+    }
+
+    const googleAiApiToken = (this.env as any).GOOGLEAI_API_KEY;
+    if (!googleAiApiToken) {
+      throw new Error("GOOGLEAI_API_KEY is not set");
+    }
+
+    const elevenLabsApiToken = (this.env as any).ELEVENLABS_API_KEY;
+    if (!elevenLabsApiToken) {
+      throw new Error("ELEVENLABS_API_KEY is not set");
+    }
+
+    const publicAccessKeyId = (this.env as any).R2_PUBLIC_ACCESS_KEY_ID;
+    if (!publicAccessKeyId) {
+      throw new Error("R2_PUBLIC_ACCESS_KEY_ID is not set");
+    }
+    const publicSecretAccessKey = (this.env as any).R2_PUBLIC_SECRET_ACCESS_KEY;
+    if (!publicSecretAccessKey) {
+      throw new Error("R2_PUBLIC_SECRET_ACCESS_KEY is not set");
+    }
+
+    const publicBucketName = (this.env as any).R2_PUBLIC_BUCKET_NAME;
+    if (!publicBucketName) {
+      throw new Error("R2_PUBLIC_BUCKET_NAME is not set");
+    }
+
+    const container = this.env.TEXT_TO_SPEECH_CONTAINER.get(
+      this.env.TEXT_TO_SPEECH_CONTAINER.idFromName(event.instanceId)
+    );
+    if (!container) {
+      throw new Error("TEXT_TO_SPEECH_CONTAINER is not set");
+    }
+
+    const db = new DatabaseService(this.env.YT_AUDIO_SUMMARY_DB);
+
+    // Define one or more steps that optionally return state.
+    // Can access bindings on `this.env`
+    // Can access params on `event.payload`
     try {
-      const submissionId = event.payload.submissionId;
-
-      const accountId = this.env.CF_ACCOUNT_ID;
-      if (!accountId) {
-        throw new Error("CF_ACCOUNT_ID is not set");
-      }
-
-      const googleAiApiToken = (this.env as any).GOOGLEAI_API_KEY;
-      if (!googleAiApiToken) {
-        throw new Error("GOOGLEAI_API_KEY is not set");
-      }
-
-      const elevenLabsApiToken = (this.env as any).ELEVENLABS_API_KEY;
-      if (!elevenLabsApiToken) {
-        throw new Error("ELEVENLABS_API_KEY is not set");
-      }
-
-      const publicAccessKeyId = (this.env as any).R2_PUBLIC_ACCESS_KEY_ID;
-      if (!publicAccessKeyId) {
-        throw new Error("R2_PUBLIC_ACCESS_KEY_ID is not set");
-      }
-      const publicSecretAccessKey = (this.env as any)
-        .R2_PUBLIC_SECRET_ACCESS_KEY;
-      if (!publicSecretAccessKey) {
-        throw new Error("R2_PUBLIC_SECRET_ACCESS_KEY is not set");
-      }
-
-      const publicBucketName = (this.env as any).R2_PUBLIC_BUCKET_NAME;
-      if (!publicBucketName) {
-        throw new Error("R2_PUBLIC_BUCKET_NAME is not set");
-      }
-
-      const container = this.env.TEXT_TO_SPEECH_CONTAINER.get(
-        this.env.TEXT_TO_SPEECH_CONTAINER.idFromName(event.instanceId)
-      );
-      if (!container) {
-        throw new Error("TEXT_TO_SPEECH_CONTAINER is not set");
-      }
-
-      const db = new DatabaseService(this.env.YT_AUDIO_SUMMARY_DB);
-
-      // Define one or more steps that optionally return state.
-      // Can access bindings on `this.env`
-      // Can access params on `event.payload`
       const videoInformation = await step.do(
         "retrieve submission",
         async () => {
@@ -82,6 +81,8 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
           return submission;
         }
       );
+      // update the submission table to processing
+      await db.markSubmissionAsProcessing(submissionId);
 
       const summarizationInformatiom = await step.do(
         "summarize video caption",
@@ -160,13 +161,19 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
           },
         },
         async () => {
-          return await stepUpdateFeedTable(db, submissionId, {
+          const feedId = await stepUpdateFeedTable(db, submissionId, {
             url: videoInformation.url,
             title: videoInformation.title,
             summaryText: summarizationInformatiom.cleanedSummary,
             r2Key: ttsInformation.r2Key,
             thumbnailUrl: videoInformation.thumbnailUrl,
           });
+          await db.markSubmissionAsCompleted(
+            submissionId,
+            ttsInformation.r2Key,
+            summarizationInformatiom.cleanedSummary
+          );
+          return feedId;
         }
       );
 
@@ -182,6 +189,9 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
         "Full error object:",
         JSON.stringify(workflowError, Object.getOwnPropertyNames(workflowError))
       );
+
+      // update the submission table to failed
+      await db.markSubmissionAsFailed(submissionId, workflowError.message);
 
       // Important: Re-throw with a clear message
       throw new Error(`SubmissionWorkflow failed: ${workflowError.message}`);
