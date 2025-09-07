@@ -69,6 +69,7 @@ pnpm db:drop          # Drop database (use with caution)
 pnpm db:check         # Check database configuration
 
 # Cloudflare
+pnpm cf-wrangler-jsonc # Generate wrangler.jsonc from template
 pnpm cf-typegen       # Generate Cloudflare types
 ```
 
@@ -117,3 +118,47 @@ pnpm cf-typegen       # Generate Cloudflare types
 - **ElevenLabs**: High-quality text-to-speech synthesis
 - **Cloudflare R2**: Object storage for audio files
 - **Cloudflare D1**: SQLite database for metadata
+
+## ⚙️ Configuration Management
+
+### Wrangler Configuration Generation
+
+The `wrangler.jsonc` file is automatically generated from a template to manage environment-specific variables securely.
+
+#### Why Template-Based Configuration?
+
+- **Security**: Sensitive values (API keys, account IDs) are kept in separate files
+- **Version Control**: Template files can be safely committed without exposing secrets
+- **Automation**: CI/CD pipelines can generate configurations with appropriate values
+
+#### How It Works
+
+1. **Template File**: `wrangler.template.jsonc` contains placeholders like `$CF_ACCOUNT_ID`
+2. **Variables File**: `wrangler.vars` contains the actual values for substitution
+3. **Generation Script**: `scripts/mkWrangleJsonc.sh` performs the substitution
+
+#### Usage
+
+```bash
+# Generate wrangler.jsonc from template
+./scripts/mkWrangleJsonc.sh
+
+# Or run from package.json
+pnpm run cf-wrangler-jsonc
+```
+
+#### File Structure
+
+```
+wrangler.template.jsonc    # Template with $VARIABLE placeholders
+wrangler.vars             # Environment-specific values
+scripts/mkWrangleJsonc.sh # Generation script
+wrangler.jsonc            # Generated configuration (gitignored)
+```
+
+#### Environment Variables
+
+The following variables are substituted during generation:
+- `CF_ACCOUNT_ID`: Cloudflare account identifier
+- `R2_PUBLIC_ACCESS_KEY_ID`: R2 bucket access key
+- `R2_PUBLIC_PREFIX_URL`: Public R2 bucket URL for audio files
