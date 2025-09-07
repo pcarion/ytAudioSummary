@@ -167,3 +167,7 @@ dist
 .wrangler/
 
 *.wav
+worker-configuration.d.ts
+wrangler.jsonc
+wrangler.vars
+
