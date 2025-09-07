@@ -6,18 +6,13 @@ import {
 } from "cloudflare:workers";
 import { stepRetrieveSubmissionFromR2 } from "./stepRetrieveSubmission";
 import { stepSummarizeWithGoogleGenAI } from "./stepSummarize";
-import { stepTextToSpeechGoogleGenAI } from "./stepTextToSpeech";
 import { stepTextToSpeechContainer } from "./stepTextToSpeechContainer";
+import { stepUpdateFeedTable } from "./stepUpdateFeedTable";
 import { TextToSpeechContainer } from "../containers/TextToSpeechContainer";
+import { DatabaseService } from "../db/queries";
 
 export interface SubmissionWorkflowParams {
   submissionId: string;
-}
-
-interface VideoInformation {
-  title: string;
-  author: string;
-  captions: string;
 }
 
 const GatewayId = "yt-audio-summary";
@@ -72,10 +67,12 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
         throw new Error("TEXT_TO_SPEECH_CONTAINER is not set");
       }
 
+      const db = new DatabaseService(this.env.YT_AUDIO_SUMMARY_DB);
+
       // Define one or more steps that optionally return state.
       // Can access bindings on `this.env`
       // Can access params on `event.payload`
-      const videoInformation: VideoInformation = await step.do(
+      const videoInformation = await step.do(
         "retrieve submission",
         async () => {
           const submission = await stepRetrieveSubmissionFromR2(
@@ -152,7 +149,28 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
           };
         }
       );
-      return `Summary (elevenlabs): ${videoInformation.title}:${ttsInformation.r2Key}`;
+
+      const feedId = await step.do(
+        "update feed table",
+        {
+          retries: {
+            limit: 3,
+            delay: 1000,
+            backoff: "exponential",
+          },
+        },
+        async () => {
+          return await stepUpdateFeedTable(db, submissionId, {
+            url: videoInformation.url,
+            title: videoInformation.title,
+            summaryText: summarizationInformatiom.cleanedSummary,
+            r2Key: ttsInformation.r2Key,
+            thumbnailUrl: videoInformation.thumbnailUrl,
+          });
+        }
+      );
+
+      return `Summary (elevenlabs): ${videoInformation.title}:feedId:${feedId}`;
     } catch (workflowError: any) {
       // Critical: Log the full error details
       console.error("=== WORKFLOW EXECUTION FAILED ===");

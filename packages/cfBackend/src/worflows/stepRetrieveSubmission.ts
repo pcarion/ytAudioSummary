@@ -24,9 +24,19 @@ export async function stepRetrieveSubmissionFromR2(
   if (!captions) {
     throw new Error("Captions data not found in submission: " + submissionId);
   }
+
+  // find thumbnail with max width and height
+  const thumbnailUrl =
+    youtubeVideo?.thumbnails?.reduce(
+      (max, thumbnail) => (thumbnail.width > max.width ? thumbnail : max),
+      youtubeVideo.thumbnails[0]
+    )?.url || "";
+
   return {
     title,
     author,
     captions,
+    url: submission.url,
+    thumbnailUrl,
   };
 }
