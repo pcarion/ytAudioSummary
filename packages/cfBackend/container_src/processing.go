@@ -100,6 +100,7 @@ func (p *Processing) IsValid() error {
 
 func (p *Processing) Process() (string, error) {
     // call textToSpeech
+    log.Printf("Calling textToSpeech: (%s) len=%d", p.Text[0:100], len(p.Text))
 	err := textToSpeech(p.Text, p.ApiKey, p.VoiceIx, p.OutputFileName)
     if err != nil {
         log.Println("Error in textToSpeech:", err)

@@ -48,7 +48,6 @@ export async function stepTextToSpeechContainer(
     const body = JSON.stringify({
       text: cleanSummary,
       elevenLabsApiToken: elevenLabsApiToken,
-      submissionId: submissionId,
       r2BucketName: bucket.bucketName,
       r2AccessKeyId: bucket.accessKeyId,
       r2SecretAccessKey: bucket.secretAccessKey,
@@ -56,40 +55,80 @@ export async function stepTextToSpeechContainer(
       r2AccountId: bucket.accountId,
     });
     console.log("Sending request to container...");
-    const result = await container.fetch(
-      new Request("http://container/process", {
-        method: "POST",
-        body: body,
-      })
-    );
+    const result = await container.processSubmission(submissionId, body);
     console.log("Response from container:");
     if (!result.ok) {
       const text = await result.text();
       const status = result.status;
       const statusText = result.statusText;
       console.error(
-        "Failed to process text to speech",
+        "Failed to start text to speech processing",
         text,
         status,
         statusText
       );
-      throw new Error("Failed to process text to speech");
+      throw new Error("Failed to start text to speech processing");
     }
+
     const json = await result.json();
-    const jsonAny = json as any;
-    const r = {
-      response: json,
-      status: result.status,
-      statusText: result.statusText,
-      headers: result.headers,
-      url: result.url,
-      ok: result.ok,
-      redirected: result.redirected,
-      cf: result.cf,
-      r2Key: jsonAny.r2Key,
-    };
-    console.log("response is:", JSON.stringify(r, null, 2));
-    return r;
+    console.log("Processing started, response:", JSON.stringify(json, null, 2));
+
+    // Poll for completion
+    const maxPollingAttempts = 60; // 5 minutes with 5-second intervals
+    const pollingInterval = 5000; // 5 seconds
+
+    for (let attempt = 0; attempt < maxPollingAttempts; attempt++) {
+      console.log(
+        `Checking status (attempt ${attempt + 1}/${maxPollingAttempts})...`
+      );
+
+      const statusResult = await container.getSubmissionStatus(submissionId);
+
+      if (!statusResult.ok) {
+        console.error(
+          "Failed to check status:",
+          statusResult.status,
+          statusResult.statusText
+        );
+        await sleep(pollingInterval);
+        continue;
+      }
+
+      const statusJson = await statusResult.json();
+      console.log("Status response:", JSON.stringify(statusJson, null, 2));
+      const statusJsonTyped = statusJson as {
+        status: string;
+        r2Key: string;
+        error: string;
+      };
+
+      if (statusJsonTyped.status === "completed") {
+        console.log("Processing completed successfully!");
+        const r = {
+          response: statusJson,
+          status: statusResult.status,
+          statusText: statusResult.statusText,
+          headers: statusResult.headers,
+          url: statusResult.url,
+          ok: statusResult.ok,
+          redirected: statusResult.redirected,
+          cf: statusResult.cf,
+          r2Key: statusJsonTyped.r2Key,
+        };
+        return r;
+      } else if (statusJsonTyped.status === "failed") {
+        console.error("Processing failed:", statusJsonTyped.error);
+        throw new Error(
+          `Text to speech processing failed: ${statusJsonTyped.error}`
+        );
+      }
+
+      // Still processing, wait and try again
+      console.log("Still processing, waiting...");
+      await sleep(pollingInterval);
+    }
+
+    throw new Error("Text to speech processing timed out");
   } catch (err) {
     console.error(
       "There was an error processing the text to speech",

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"os"
 	"time"
@@ -135,19 +134,8 @@ func textToSpeech(text string, apiKey string, voiceIx int, outputFileName string
 	req.Header.Set("xi-api-key", apiKey)
 	req.Header.Set("Content-Type", "application/json")
 
-	// Configure HTTP client with timeout and custom DNS resolver
-	client := &http.Client{
-		Timeout: 30 * time.Second,
-		Transport: &http.Transport{
-			DialContext: (&net.Dialer{
-				Timeout:   10 * time.Second,
-				KeepAlive: 30 * time.Second,
-			}).DialContext,
-			MaxIdleConns:        100,
-			IdleConnTimeout:     90 * time.Second,
-			TLSHandshakeTimeout: 10 * time.Second,
-		},
-	}
+	// Configure HTTP client
+	client := &http.Client{}
 
 	// Retry logic for network issues
 	var resp *http.Response

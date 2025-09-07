@@ -28,6 +28,23 @@ export class TextToSpeechContainer extends DurableObject<Env> {
       .fetch("http://container/_health");
   }
 
+  async processSubmission(submissionId: string, body: string) {
+    return await this.container
+      .getTcpPort(8080)
+      .fetch(`http://container/process/${submissionId}`, {
+        method: "POST",
+        body: body,
+      });
+  }
+
+  async getSubmissionStatus(submissionId: string) {
+    return await this.container
+      .getTcpPort(8080)
+      .fetch(`http://container/status/${submissionId}`, {
+        method: "GET",
+      });
+  }
+
   async destroy() {
     await this.ctx.container?.destroy();
     await this.ctx.storage.deleteAll();
@@ -36,12 +53,12 @@ export class TextToSpeechContainer extends DurableObject<Env> {
     this.ctx.abort();
   }
 
-  async fetch(req: Request): Promise<Response> {
-    return await this.container
-      .getTcpPort(8080)
-      .fetch("http://container/process", {
-        method: "POST",
-        body: req.body,
-      });
-  }
+  // async fetch(req: Request): Promise<Response> {
+  //   return await this.container
+  //     .getTcpPort(8080)
+  //     .fetch("http://container/process", {
+  //       method: "POST",
+  //       body: req.body,
+  //     });
+  // }
 }
