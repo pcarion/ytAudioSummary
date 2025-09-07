@@ -76,7 +76,6 @@ export const getMeResponse = z.object({
     z.object({
       submissionId: z.string(),
       date: z.string(),
-      approvalStatus: z.enum(["notConfirmed", "confirmed", "rejected"]),
       submissionStatus: z.enum([
         "pending",
         "processing",

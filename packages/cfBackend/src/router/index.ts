@@ -116,6 +116,9 @@ export const appRouter = router({
         params,
       });
 
+      // update the submission table to processing
+      await db.markSubmissionAsProcessing(input.submissionId);
+
       return {
         success: true,
         message: `Submission ${input.submissionId} approved and processing started, workflow instance: ${workflowInstance.id}`,
@@ -167,10 +170,6 @@ export const appRouter = router({
     const lastSubmissions = submissions.map((sub) => ({
       submissionId: sub.id,
       date: sub.createdAt,
-      approvalStatus:
-        sub.status === "pending"
-          ? ("notConfirmed" as const)
-          : ("confirmed" as const),
       submissionStatus:
         sub.status === "cancelled"
           ? ("failed" as const)

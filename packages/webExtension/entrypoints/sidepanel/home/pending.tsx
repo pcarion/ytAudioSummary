@@ -9,6 +9,9 @@ export interface PendingSubmission {
   url: string;
   date: string;
   thumbnailUrl: string;
+  isPending: boolean;
+  isProcessing: boolean;
+  isError: boolean;
 }
 
 export interface PendingSubmissionProps {
@@ -26,7 +29,7 @@ export function PendingSubmission({
   onLoadUrl,
   isLoading = false,
 }: PendingSubmissionProps) {
-  const { submissionId, title, url, thumbnailUrl } = submission;
+  const { submissionId, title, url, thumbnailUrl, isPending } = submission;
 
   const handleClickUrl = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (onLoadUrl) {
@@ -35,6 +38,8 @@ export function PendingSubmission({
     }
     // else, default anchor behavior
   };
+
+  console.log("submission", submission);
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-lg border p-2 max-w-md mx-auto flex flex-col gap-4 shadow">
@@ -102,28 +107,30 @@ export function PendingSubmission({
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between mt-2">
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="default"
-            className="px-4 bg-green-600 hover:bg-green-700 text-white dark:bg-green-500 dark:hover:bg-green-600 dark:text-white"
-            onClick={() => onApprove(submissionId)}
-            disabled={isLoading}
-          >
-            Approve
-          </Button>
-          <Button
-            size="sm"
-            variant="destructive"
-            className="px-4 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600 dark:text-white"
-            onClick={() => onReject(submissionId)}
-            disabled={isLoading}
-          >
-            Reject
-          </Button>
+      {isPending ? (
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="default"
+              className="px-4 bg-green-600 hover:bg-green-700 text-white dark:bg-green-500 dark:hover:bg-green-600 dark:text-white"
+              onClick={() => onApprove(submissionId)}
+              disabled={isLoading}
+            >
+              Approve
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              className="px-4 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600 dark:text-white"
+              onClick={() => onReject(submissionId)}
+              disabled={isLoading}
+            >
+              Reject
+            </Button>
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
