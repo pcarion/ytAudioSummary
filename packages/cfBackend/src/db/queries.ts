@@ -90,6 +90,7 @@ export class DatabaseService {
         url: feedContents.url,
         summaryText: feedContents.summaryText,
         audioFileUrl: feedContents.audioFileUrl,
+        thumbnailUrl: feedContents.thumbnailUrl,
         createdAt: feedContents.createdAt,
         submission: {
           id: submissions.id,

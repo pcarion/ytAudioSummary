@@ -136,6 +136,7 @@ func (p *Processing) Process() (string, error) {
         Bucket: &p.R2BucketName,
         Key: &r2Key,
         Body: outputFile,
+        ContentType: aws.String("audio/mpeg"),
     })
     if err != nil {
         log.Printf("Error writing to s3 (%s): %v", r2Key, err)

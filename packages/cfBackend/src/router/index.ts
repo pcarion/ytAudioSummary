@@ -157,6 +157,7 @@ export const appRouter = router({
   // Get user info
   getMe: publicProcedure.output(getMeResponse).query(async ({ ctx }) => {
     console.log("getMe called");
+    const r2PublicPrefixUrl = ctx.env.R2_PUBLIC_PREFIX_URL;
 
     // Initialize database service
     const db = new DatabaseService(ctx.env.YT_AUDIO_SUMMARY_DB);
@@ -180,13 +181,15 @@ export const appRouter = router({
     }));
 
     // Get all feed contents
-    const feedContents = await db.getFeedContents(10);
+    const feedContents = await db.getFeedContents(100);
     const feedContentsFormatted = feedContents.map((content) => ({
       contentId: content.id,
       title: content.title,
       author: "YouTube Channel", // This would come from the submission data
-      pathToAudio: content.audioFileUrl || "/audio/default.mp3",
-      pathToImage: "/images/default.jpg", // This would be generated from thumbnails
+      pathToAudio: content.audioFileUrl
+        ? `${r2PublicPrefixUrl}/${content.audioFileUrl}`
+        : "",
+      pathToImage: content.thumbnailUrl || "",
       originalContentUrl: content.url,
     }));
 
