@@ -264,7 +264,7 @@ export function Home({ onNavigateToFeed, onNavigateToSettings }: HomeProps) {
                   size="lg"
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold px-10 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-200 rounded-lg"
                 >
-                  {isLoading ? "Processing..." : "Analyze Page"}
+                  {isLoading ? "Processing..." : "Analyze Video"}
                 </Button>
               </div>
             </div>

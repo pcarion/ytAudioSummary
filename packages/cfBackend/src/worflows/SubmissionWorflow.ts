@@ -78,12 +78,12 @@ export class SubmissionWorkflow extends WorkflowEntrypoint<
             submissionId,
             this.env.YT_AUDIO_SUMMARY_BUCKET
           );
+          // update the submission table to processing
+          await db.markSubmissionAsProcessing(submissionId);
+
           return submission;
         }
       );
-      // update the submission table to processing
-      await db.markSubmissionAsProcessing(submissionId);
-
       const summarizationInformatiom = await step.do(
         "summarize video caption",
         {

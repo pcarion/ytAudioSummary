@@ -117,7 +117,7 @@ export function PendingSubmission({
               onClick={() => onApprove(submissionId)}
               disabled={isLoading}
             >
-              Approve
+              Process Summary
             </Button>
             <Button
               size="sm"
@@ -126,7 +126,7 @@ export function PendingSubmission({
               onClick={() => onReject(submissionId)}
               disabled={isLoading}
             >
-              Reject
+              Cancel
             </Button>
           </div>
         </div>
